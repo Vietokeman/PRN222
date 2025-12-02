@@ -47,15 +47,12 @@ namespace FFHRRequestSystem.Repositories.VietN
             try
             {
                 return await _context.TicketProcessingVietNs
-                     //.Where(c => c.Title.Contains(tilte) 
-                     //&& c.Description.Contains(description)
-                     //&& c.TotalTicket == totalTicket)
-                     //.OrderByDescending(c => c.ReportRecordLinhNbid)
-                     //.ToListAsync();
-                     .Include(c => c.TicketProcessingVietNid)
-                     .Where(c => (string.IsNullOrEmpty(processingAction) || c.ProcessingAction.Contains(processingAction)
-                     )
-                     ;
+                     .Include(c => c.ProcessingTypeVietN)
+                     .Where(c => (string.IsNullOrEmpty(processingAction) || c.ProcessingAction.Contains(processingAction))
+                     && (string.IsNullOrEmpty(ActionDescription) || c.ActionDescription.Contains(ActionDescription))
+                     && (string.IsNullOrEmpty(TypeName) || c.ProcessingTypeVietN.TypeName.Contains(TypeName)))
+                     .OrderByDescending(c => c.TicketProcessingVietNid)
+                     .ToListAsync();
             }
             catch (Exception ex)
             {
