@@ -1,0 +1,110 @@
+﻿@page
+@model FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>TicketProcessingVietN</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="TicketProcessingVietN.TicketProcessingVietNid" />
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.ProcessingCode" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.ProcessingCode" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.ProcessingCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.TicketReference" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.TicketReference" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.TicketReference" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.ProcessingTypeVietNid" class="control-label"></label>
+                <select asp-for="TicketProcessingVietN.ProcessingTypeVietNid" class="form-control" asp-items="ViewBag.ProcessingTypeVietNid"></select>
+                <span asp-validation-for="TicketProcessingVietN.ProcessingTypeVietNid" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.ProcessingAction" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.ProcessingAction" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.ProcessingAction" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.ActionDescription" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.ActionDescription" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.ActionDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.RelatedTicketCode" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.RelatedTicketCode" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.RelatedTicketCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.PriorityLevel" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.PriorityLevel" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.PriorityLevel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.Status" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.Status" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.OverdueDays" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.OverdueDays" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.OverdueDays" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.EscalationLevel" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.EscalationLevel" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.EscalationLevel" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="TicketProcessingVietN.IsAutoProcessed" /> @Html.DisplayNameFor(model => model.TicketProcessingVietN.IsAutoProcessed)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.ProcessedBy" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.ProcessedBy" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.ProcessedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.ProcessedDate" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.ProcessedDate" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.ProcessedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.ResolvedNote" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.ResolvedNote" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.ResolvedNote" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.CreatedDate" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.CreatedDate" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.CreatedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicketProcessingVietN.ModifiedDate" class="control-label"></label>
+                <input asp-for="TicketProcessingVietN.ModifiedDate" class="form-control" />
+                <span asp-validation-for="TicketProcessingVietN.ModifiedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

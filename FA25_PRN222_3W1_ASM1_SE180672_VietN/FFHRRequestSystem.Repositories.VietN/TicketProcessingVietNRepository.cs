@@ -22,8 +22,8 @@ namespace FFHRRequestSystem.Repositories.VietN
         {
             try
             {
-                return await _context.TicketProcessingVietNs.Include(c => c.TicketProcessingVietNid)
-                    .OrderByDescending(c => c.TicketProcessingVietNid).ToListAsync();
+                return await _context.TicketProcessingVietNs.Include(c => c.ProcessingTypeVietN)
+                    .OrderByDescending(c => c.CreatedDate).ToListAsync();
             }
             catch (Exception ex)
             {

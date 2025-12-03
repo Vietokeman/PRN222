@@ -1,7 +1,13 @@
+using FFHRRequestSystem.Services.VietN;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+//DI
+builder.Services.AddScoped<TicketProcessingVietNService>();
+builder.Services.AddScoped<ProcessingTypeVietNService>();
 
 var app = builder.Build();
 

@@ -1,0 +1,198 @@
+﻿@page
+@model FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs.DetailsModel
+
+@{
+    ViewData["Title"] = "Ticket Processing Details";
+
+    string priorityText = Model.TicketProcessingVietN.PriorityLevel switch
+    {
+        3 => "High",
+        2 => "Medium",
+        _ => "Low"
+    };
+    string priorityClass = Model.TicketProcessingVietN.PriorityLevel switch
+    {
+        3 => "bg-danger",
+        2 => "bg-warning text-dark",
+        _ => "bg-secondary"
+    };
+
+    string statusText = Model.TicketProcessingVietN.Status switch
+    {
+        1 => "Active",
+        2 => "Resolved",
+        3 => "Closed",
+        _ => "Unknown"
+    };
+    string statusClass = Model.TicketProcessingVietN.Status switch
+    {
+        1 => "bg-success",
+        2 => "bg-info",
+        3 => "bg-secondary",
+        _ => "bg-light text-dark"
+    };
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-ticket-detailed me-2"></i>Ticket Processing Details
+        </h2>
+        <div>
+            <a asp-page="./Edit" asp-route-id="@Model.TicketProcessingVietN.TicketProcessingVietNid" class="btn btn-primary me-2">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a asp-page="./Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Basic Information Card -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-info-circle me-2"></i>Basic Information
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Processing Code</label>
+                        <p class="mb-0 fs-5">@Model.TicketProcessingVietN.ProcessingCode</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Ticket Reference</label>
+                        <p class="mb-0 fs-5">@Model.TicketProcessingVietN.TicketReference</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Processing Type</label>
+                        <p class="mb-0 fs-5">@Model.TicketProcessingVietN.ProcessingTypeVietN?.TypeName</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Details Card -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-gear me-2"></i>Processing Details
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Processing Action</label>
+                        <p class="mb-0">@Model.TicketProcessingVietN.ProcessingAction</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Action Description</label>
+                        <p class="mb-0">@Model.TicketProcessingVietN.ActionDescription</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Priority Level</label>
+                        <p class="mb-0">
+                            <span class="badge @priorityClass fs-6">@priorityText</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Status</label>
+                        <p class="mb-0">
+                            <span class="badge @statusClass fs-6">@statusText</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Overdue Days</label>
+                        <p class="mb-0">@Model.TicketProcessingVietN.OverdueDays</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Escalation Level</label>
+                        <p class="mb-0">@Model.TicketProcessingVietN.EscalationLevel</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Auto Processed</label>
+                        <p class="mb-0">
+                            @if (Model.TicketProcessingVietN.IsAutoProcessed)
+                            {
+                                <span class="badge bg-info text-dark">Automatic</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-dark">Manual</span>
+                            }
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Processed By</label>
+                        <p class="mb-0">@Model.TicketProcessingVietN.ProcessedBy</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dates and Notes Card -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+                <i class="bi bi-calendar-event me-2"></i>Dates & Notes
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Created Date</label>
+                        <p class="mb-0">@Model.TicketProcessingVietN.CreatedDate?.ToString("dddd, MMMM dd, yyyy")</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Modified Date</label>
+                        <p class="mb-0">@Model.TicketProcessingVietN.ModifiedDate?.ToString("dddd, MMMM dd, yyyy")</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Processed Date</label>
+                        <p class="mb-0">@Model.TicketProcessingVietN.ProcessedDate?.ToString("dddd, MMMM dd, yyyy")</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded p-3 h-100">
+                        <label class="form-label fw-bold text-muted">Related Ticket Code</label>
+                        <p class="mb-0">@Model.TicketProcessingVietN.RelatedTicketCode</p>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="border rounded p-3">
+                        <label class="form-label fw-bold text-muted">Resolved Note</label>
+                        <p class="mb-0">@Model.TicketProcessingVietN.ResolvedNote</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
