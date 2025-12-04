@@ -1,23 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using FFHRRequestSystem.Entitites.VietN.Models;
+using FFHRRequestSystem.Repositories.VietN.DBContext;
+using FFHRRequestSystem.Services.VietN;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using FFHRRequestSystem.Entitites.VietN.Models;
-using FFHRRequestSystem.Repositories.VietN.DBContext;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
 {
+    [Authorize(Roles ="1, 3")]
+
     public class EditModel : PageModel
     {
-        private readonly FFHRRequestSystem.Repositories.VietN.DBContext.FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext _context;
-
-        public EditModel(FFHRRequestSystem.Repositories.VietN.DBContext.FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext context)
+        private readonly TicketProcessingVietNService _service;
+        private readonly ProcessingTypeVietNService _typeService;
+        public EditModel(TicketProcessingVietNService service, ProcessingTypeVietNService typeService)
         {
-            _context = context;
+            _service = service;
+            _typeService = typeService;
         }
 
         [BindProperty]
@@ -30,14 +35,14 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
                 return NotFound();
             }
 
-            var ticketprocessingvietn =  await _context.TicketProcessingVietNs.FirstOrDefaultAsync(m => m.TicketProcessingVietNid == id);
+            var ticketprocessingvietn =  await _service.GetByIdAsync(id.Value);
             if (ticketprocessingvietn == null)
             {
                 return NotFound();
             }
             TicketProcessingVietN = ticketprocessingvietn;
-           ViewData["ProcessingTypeVietNid"] = new SelectList(_context.ProcessingTypeVietNs, "ProcessingTypeVietNid", "TypeCode");
-            return Page();
+            var selectListItems = await _typeService.GetAllAsync();
+            ViewData["ProcessingTypeVietNid"] = new SelectList(selectListItems, "ProcessingTypeVietNid", "TypeName"); return Page();
         }
 
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -48,31 +53,21 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
             {
                 return Page();
             }
+            TicketProcessingVietN.ModifiedDate = DateTime.Now;
 
-            _context.Attach(TicketProcessingVietN).State = EntityState.Modified;
+            // ✔ Không cho sửa CreatedDate
+            ModelState.Remove("TicketProcessingVietN.CreatedDate");
+            var result = await _service.UpdateAsync(TicketProcessingVietN);
 
-            try
+            if (result > 0)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TicketProcessingVietNExists(TicketProcessingVietN.TicketProcessingVietNid))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return RedirectToPage("./Index");
             }
 
-            return RedirectToPage("./Index");
+            var processingTypes = await _typeService.GetAllAsync();
+            ViewData["ProcessingTypeVietNid"] = new SelectList(processingTypes, "ProcessingTypeVietNid", "TypeName");
+            return Page();
         }
 
-        private bool TicketProcessingVietNExists(Guid id)
-        {
-            return _context.TicketProcessingVietNs.Any(e => e.TicketProcessingVietNid == id);
-        }
     }
 }

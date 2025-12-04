@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using FFHRRequestSystem.Entitites.VietN.Models;
+using FFHRRequestSystem.Repositories.VietN.DBContext;
+using FFHRRequestSystem.Services.VietN;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using FFHRRequestSystem.Entitites.VietN.Models;
-using FFHRRequestSystem.Repositories.VietN.DBContext;
-using FFHRRequestSystem.Services.VietN;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
 {
+    [Authorize]
+
     public class DetailsModel : PageModel
     {
         private readonly TicketProcessingVietNService _service;

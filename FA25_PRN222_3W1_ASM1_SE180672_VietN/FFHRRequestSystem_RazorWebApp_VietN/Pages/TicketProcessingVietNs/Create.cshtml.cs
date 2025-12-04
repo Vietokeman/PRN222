@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using FFHRRequestSystem.Entitites.VietN.Models;
+using FFHRRequestSystem.Repositories.VietN.DBContext;
+using FFHRRequestSystem.Services.VietN;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using FFHRRequestSystem.Entitites.VietN.Models;
-using FFHRRequestSystem.Repositories.VietN.DBContext;
-using FFHRRequestSystem.Services.VietN;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
 {
+    [Authorize(Roles = "1, 3")]
     public class CreateModel : PageModel
     {
         private readonly TicketProcessingVietNService _ticketService;

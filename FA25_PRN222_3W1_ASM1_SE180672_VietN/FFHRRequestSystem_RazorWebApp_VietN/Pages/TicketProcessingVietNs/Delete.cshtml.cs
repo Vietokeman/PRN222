@@ -1,22 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using FFHRRequestSystem.Entitites.VietN.Models;
+using FFHRRequestSystem.Repositories.VietN.DBContext;
+using FFHRRequestSystem.Services.VietN;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using FFHRRequestSystem.Entitites.VietN.Models;
-using FFHRRequestSystem.Repositories.VietN.DBContext;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
 {
+    [Authorize(Roles = "1, 3")]
     public class DeleteModel : PageModel
     {
-        private readonly FFHRRequestSystem.Repositories.VietN.DBContext.FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext _context;
+        private readonly TicketProcessingVietNService _service;
 
-        public DeleteModel(FFHRRequestSystem.Repositories.VietN.DBContext.FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext context)
+        public DeleteModel(TicketProcessingVietNService service)
         {
-            _context = context;
+            _service = service;
         }
 
         [BindProperty]
@@ -29,7 +32,7 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
                 return NotFound();
             }
 
-            var ticketprocessingvietn = await _context.TicketProcessingVietNs.FirstOrDefaultAsync(m => m.TicketProcessingVietNid == id);
+            var ticketprocessingvietn = await _service.GetByIdAsync(id.Value);
 
             if (ticketprocessingvietn == null)
             {
@@ -49,12 +52,10 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
                 return NotFound();
             }
 
-            var ticketprocessingvietn = await _context.TicketProcessingVietNs.FindAsync(id);
-            if (ticketprocessingvietn != null)
+            var result = _service.DeleteAsync(id.Value);
+            if (result == null)
             {
-                TicketProcessingVietN = ticketprocessingvietn;
-                _context.TicketProcessingVietNs.Remove(TicketProcessingVietN);
-                await _context.SaveChangesAsync();
+                return Page();
             }
 
             return RedirectToPage("./Index");

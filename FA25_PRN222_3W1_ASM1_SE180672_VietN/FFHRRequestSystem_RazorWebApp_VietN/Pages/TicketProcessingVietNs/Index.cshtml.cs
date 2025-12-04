@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using FFHRRequestSystem.Entitites.VietN.Models;
 using FFHRRequestSystem.Services.VietN;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
 {
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly TicketProcessingVietNService _service;
