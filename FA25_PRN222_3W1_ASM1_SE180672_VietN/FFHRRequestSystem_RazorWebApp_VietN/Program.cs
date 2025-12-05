@@ -39,7 +39,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Map SignalR hub
-app.MapHub<TicketProcessingHub>("/ticketProcessingHub");
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.MapRazorPages().RequireAuthorization();
 

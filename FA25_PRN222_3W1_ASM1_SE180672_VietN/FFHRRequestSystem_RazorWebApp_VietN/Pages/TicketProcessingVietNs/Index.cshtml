@@ -188,22 +188,22 @@
 
         "use strict";
 
-        var connection = new signalR.HubConnectionBuilder().withUrl("/ticketProcessingHub").build();
+        var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
 
         connection.start().then(function () {
-            console.log("Connected to TicketProcessingHub");
+            console.log("Connected to NotificationHub");
         }).catch(function (err) {
             return console.error(err.toString());
         });
 
-        connection.on("Receiver_CreateTicketProcessingVietN", function (processingCode) {
+        connection.on("ReceiverCreate", function (message) {
             // Reload the page or update the table to show the new item
             location.reload();
         });
 
-        connection.on("Receiver_DeleteTicketProcessingVietN", function (ticketProcessingId) {
+        connection.on("ReceiverDelete", function (id) {
             // Remove the row from the table
-            $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingId}']`).remove();
+            $('#ticketProcessingTable tbody').find(`tr[data-id='${id}']`).remove();
         });
     </script>
 }

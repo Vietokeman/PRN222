@@ -18,9 +18,9 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
     {
         private readonly TicketProcessingVietNService _ticketService;
         private readonly ProcessingTypeVietNService _typeService;
-        private readonly IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.TicketProcessingHub> _hubContext;
+        private readonly IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.NotificationHub> _hubContext;
 
-        public CreateModel(TicketProcessingVietNService ticketService, ProcessingTypeVietNService typeService, IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.TicketProcessingHub> hubContext)
+        public CreateModel(TicketProcessingVietNService ticketService, ProcessingTypeVietNService typeService, IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.NotificationHub> hubContext)
         {
            _ticketService = ticketService;
               _typeService = typeService;
@@ -60,7 +60,7 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
                 if (result > 0)
                 {
                     // Notify all clients about the new ticket processing
-                    await _hubContext.Clients.All.SendAsync("Receiver_CreateTicketProcessingVietN", TicketProcessingVietN.ProcessingCode);
+                    await _hubContext.Clients.All.SendAsync("ReceiverCreate", TicketProcessingVietN.ProcessingCode);
                     return RedirectToPage("./Index");
                 }
                 var selectListItems = await _typeService.GetAllAsync();

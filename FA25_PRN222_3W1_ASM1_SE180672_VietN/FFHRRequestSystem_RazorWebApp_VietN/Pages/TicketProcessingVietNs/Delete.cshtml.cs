@@ -17,9 +17,9 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
     public class DeleteModel : PageModel
     {
         private readonly TicketProcessingVietNService _service;
-        private readonly IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.TicketProcessingHub> _hubContext;
+        private readonly IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.NotificationHub> _hubContext;
 
-        public DeleteModel(TicketProcessingVietNService service, IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.TicketProcessingHub> hubContext)
+        public DeleteModel(TicketProcessingVietNService service, IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.NotificationHub> hubContext)
         {
             _service = service;
             _hubContext = hubContext;
@@ -62,7 +62,7 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
             }
 
             // Notify all clients about the deleted ticket processing
-            await _hubContext.Clients.All.SendAsync("Receiver_DeleteTicketProcessingVietN", id.Value.ToString());
+            await _hubContext.Clients.All.SendAsync("ReceiverDelete", id.Value.ToString());
 
             return RedirectToPage("./Index");
         }
