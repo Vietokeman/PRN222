@@ -47,7 +47,9 @@ namespace FFHRRequestSystem.Services.VietN
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                // Log the inner exception for better debugging
+                var innerMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                throw new Exception($"Error saving entity: {innerMessage}");
             }
         }
 

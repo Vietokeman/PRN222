@@ -52,16 +52,32 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
         {
             if (ModelState.IsValid)
             {
-                // Set default dates
-                TicketProcessingVietN.CreatedDate = DateTime.Now;
-                TicketProcessingVietN.ModifiedDate = DateTime.Now;
+                // Ensure new Guid for ID
+                TicketProcessingVietN.TicketProcessingVietNid = Guid.NewGuid();
 
-                var result = await _ticketService.CreateAsync(TicketProcessingVietN);
-                if (result > 0)
+                // Set default dates
+                TicketProcessingVietN.CreatedDate = DateTime.UtcNow;
+                TicketProcessingVietN.ModifiedDate = DateTime.UtcNow;
+
+                try
                 {
-                    // Notify all clients about the new ticket processing
-                    await _hubContext.Clients.All.SendAsync("ReceiverCreate", TicketProcessingVietN.ProcessingCode);
-                    return RedirectToPage("./Index");
+                    var result = await _ticketService.CreateAsync(TicketProcessingVietN);
+                    if (result > 0)
+                    {
+                        // Notify all clients about the new ticket processing
+                        await _hubContext.Clients.All.SendAsync("ReceiverCreate", TicketProcessingVietN.ProcessingCode);
+                        return RedirectToPage("./Index");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log the detailed error
+                    ModelState.AddModelError(string.Empty, $"Error creating record: {ex.Message}");
+                    if (ex.InnerException != null)
+                    {
+                        ModelState.AddModelError(string.Empty, $"Inner exception: {ex.InnerException.Message}");
+                    }
+                    return Page();
                 }
                 var selectListItems = await _typeService.GetAllAsync();
                 ViewData["ProcessingTypeVietNid"] = new SelectList(selectListItems, "ProcessingTypeVietNid", "TypeName", TicketProcessingVietN.ProcessingTypeVietNid);
