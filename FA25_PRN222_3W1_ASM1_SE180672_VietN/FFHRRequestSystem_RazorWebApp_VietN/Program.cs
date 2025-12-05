@@ -1,10 +1,14 @@
 using FFHRRequestSystem.Services.VietN;
+using FFHRRequestSystem_RazorWebApp_VietN.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+// Add SignalR
+builder.Services.AddSignalR();
 
 //DI
 builder.Services.AddScoped<TicketProcessingVietNService>();
@@ -33,6 +37,9 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Map SignalR hub
+app.MapHub<TicketProcessingHub>("/ticketProcessingHub");
 
 app.MapRazorPages().RequireAuthorization();
 

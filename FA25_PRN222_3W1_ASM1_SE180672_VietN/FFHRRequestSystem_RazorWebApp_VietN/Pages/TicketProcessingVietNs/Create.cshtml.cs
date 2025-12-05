@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +18,13 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
     {
         private readonly TicketProcessingVietNService _ticketService;
         private readonly ProcessingTypeVietNService _typeService;
+        private readonly IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.TicketProcessingHub> _hubContext;
 
-        public CreateModel(TicketProcessingVietNService ticketService, ProcessingTypeVietNService typeService)
+        public CreateModel(TicketProcessingVietNService ticketService, ProcessingTypeVietNService typeService, IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.TicketProcessingHub> hubContext)
         {
            _ticketService = ticketService;
               _typeService = typeService;
+            _hubContext = hubContext;
         }
 
         public async Task<IActionResult> OnGet()
@@ -56,6 +59,8 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
                 var result = await _ticketService.CreateAsync(TicketProcessingVietN);
                 if (result > 0)
                 {
+                    // Notify all clients about the new ticket processing
+                    await _hubContext.Clients.All.SendAsync("Receiver_CreateTicketProcessingVietN", TicketProcessingVietN.ProcessingCode);
                     return RedirectToPage("./Index");
                 }
                 var selectListItems = await _typeService.GetAllAsync();

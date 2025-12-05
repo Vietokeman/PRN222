@@ -79,7 +79,7 @@
                     <tbody>
                         @foreach (var item in Model.TicketProcessingVietN)
                         {
-                            <tr>
+                            <tr data-id="@item.TicketProcessingVietNid">
                                 <td>@item.ProcessingCode</td>
                                 <td>@item.TicketReference</td>
                                 <td>@item.ProcessingAction</td>
@@ -175,6 +175,7 @@
 @section Scripts {
     <script src="~/lib/jquery/jquery.min.js"></script>
     <script src="~/table-pagination.js"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script>
         $(document).ready(function() {
             $('#ticketProcessingTable').createTablePagination({
@@ -183,6 +184,26 @@
                 fontColor: '#333',  
                 transitionDuration: 300  
             });
+        });
+
+        "use strict";
+
+        var connection = new signalR.HubConnectionBuilder().withUrl("/ticketProcessingHub").build();
+
+        connection.start().then(function () {
+            console.log("Connected to TicketProcessingHub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        connection.on("Receiver_CreateTicketProcessingVietN", function (processingCode) {
+            // Reload the page or update the table to show the new item
+            location.reload();
+        });
+
+        connection.on("Receiver_DeleteTicketProcessingVietN", function (ticketProcessingId) {
+            // Remove the row from the table
+            $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingId}']`).remove();
         });
     </script>
 }

@@ -4,6 +4,7 @@ using FFHRRequestSystem.Services.VietN;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,10 +17,12 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
     public class DeleteModel : PageModel
     {
         private readonly TicketProcessingVietNService _service;
+        private readonly IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.TicketProcessingHub> _hubContext;
 
-        public DeleteModel(TicketProcessingVietNService service)
+        public DeleteModel(TicketProcessingVietNService service, IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.TicketProcessingHub> hubContext)
         {
             _service = service;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -57,6 +60,9 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
             {
                 return Page();
             }
+
+            // Notify all clients about the deleted ticket processing
+            await _hubContext.Clients.All.SendAsync("Receiver_DeleteTicketProcessingVietN", id.Value.ToString());
 
             return RedirectToPage("./Index");
         }
