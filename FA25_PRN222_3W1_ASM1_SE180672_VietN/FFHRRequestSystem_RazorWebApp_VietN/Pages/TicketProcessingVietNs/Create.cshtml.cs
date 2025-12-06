@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
@@ -85,6 +86,15 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
 
             ModelState.AddModelError(string.Empty, "An error occurred while creating the ticket processing record.");
             return Page();
+        }
+
+        private bool ValidateTicketReference(string ticketReference)
+        {
+            if (string.IsNullOrEmpty(ticketReference)) return false;
+
+            // Regex: starts with uppercase, followed by letters, numbers, spaces (for Title Case), no special chars
+            var regex = new Regex(@"^[A-Z][a-zA-Z0-9\s]*$");
+            return regex.IsMatch(ticketReference) && !ticketReference.Contains("@") && !ticketReference.Contains("#");
         }
     }
 }
