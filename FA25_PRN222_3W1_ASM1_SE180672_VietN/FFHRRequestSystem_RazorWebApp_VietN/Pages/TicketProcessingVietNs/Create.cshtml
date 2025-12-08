@@ -147,6 +147,9 @@
                     <a asp-page="./Index" class="btn btn-secondary">
                         <i class="bi bi-x-circle"></i> Cancel
                     </a>
+                    <button type="button" id="btnHubCreate" class="btn btn-warning">
+                        <i class="bi bi-broadcast"></i> Test SignalR Create
+                    </button>
                     <button type="submit" class="btn btn-success">
                         <i class="bi bi-check-circle"></i> Create Ticket Processing
                     </button>
@@ -158,7 +161,54 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script>
+        // SignalR Connection
+        "use strict";
+        var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
+
+        connection.start().then(function () {
+            console.log("Connected to NotificationHub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        // Test SignalR Create Button
+        document.getElementById("btnHubCreate").addEventListener("click", function (event) {
+            var jsonData = JSON.stringify({
+                TicketProcessingVietNid: generateGuid(),
+                ProcessingCode: document.getElementById("TicketProcessingVietN_ProcessingCode").value || "TEST-" + Date.now(),
+                TicketReference: document.getElementById("TicketProcessingVietN_TicketReference").value || "TESTREF-" + Date.now(),
+                ProcessingAction: document.getElementById("TicketProcessingVietN_ProcessingAction").value || "Test Action",
+                ActionDescription: document.getElementById("TicketProcessingVietN_ActionDescription").value || "Test Description",
+                PriorityLevel: parseInt(document.getElementById("TicketProcessingVietN_PriorityLevel").value) || 1,
+                Status: parseInt(document.getElementById("TicketProcessingVietN_Status").value) || 1,
+                OverdueDays: parseInt(document.getElementById("TicketProcessingVietN_OverdueDays").value) || 0,
+                EscalationLevel: parseInt(document.getElementById("TicketProcessingVietN_EscalationLevel").value) || 0,
+                IsAutoProcessed: document.getElementById("TicketProcessingVietN_IsAutoProcessed").checked,
+                ProcessedBy: document.getElementById("TicketProcessingVietN_ProcessedBy").value || "Test User",
+                CreatedDate: new Date().toISOString(),
+                TypeName: document.querySelector("#TicketProcessingVietN_ProcessingTypeVietNid option:checked")?.text || "Test Type"
+            });
+
+            connection.invoke("HubCreate", jsonData).then(function () {
+                alert("SignalR Create notification sent successfully!");
+                console.log("Create notification sent:", jsonData);
+            }).catch(function (err) {
+                console.error(err.toString());
+                alert("Error sending SignalR notification: " + err.toString());
+            });
+
+            event.preventDefault();
+        });
+
+        function generateGuid() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
         // Bootstrap validation
         (function () {
             'use strict'

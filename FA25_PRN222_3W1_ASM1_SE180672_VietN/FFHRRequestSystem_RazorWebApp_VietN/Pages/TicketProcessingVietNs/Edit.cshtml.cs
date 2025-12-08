@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,10 +21,13 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
     {
         private readonly TicketProcessingVietNService _service;
         private readonly ProcessingTypeVietNService _typeService;
-        public EditModel(TicketProcessingVietNService service, ProcessingTypeVietNService typeService)
+        private readonly IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.NotificationHub> _hubContext;
+
+        public EditModel(TicketProcessingVietNService service, ProcessingTypeVietNService typeService, IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.NotificationHub> hubContext)
         {
             _service = service;
             _typeService = typeService;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -62,6 +66,8 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
 
             if (result > 0)
             {
+                // Notify all clients about the updated ticket processing
+                await _hubContext.Clients.All.SendAsync("ReceiverUpdate", TicketProcessingVietN.TicketProcessingVietNid.ToString());
                 return RedirectToPage("./Index");
             }
 

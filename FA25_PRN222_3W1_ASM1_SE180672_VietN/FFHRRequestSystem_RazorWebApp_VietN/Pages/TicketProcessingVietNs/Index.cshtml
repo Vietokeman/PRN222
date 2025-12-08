@@ -11,6 +11,9 @@
             <a asp-page="Create" class="btn btn-success">
                 <i class="bi bi-plus-circle me-1"></i> Create New
             </a>
+            <a asp-page="TestSignalR" class="btn btn-warning">
+                <i class="bi bi-broadcast me-1"></i> Test SignalR
+            </a>
             <a asp-page="/Account/Logout" class="btn btn-outline-danger">
                 <i class="bi bi-box-arrow-right me-1"></i> Logout
             </a>
@@ -196,14 +199,65 @@
             return console.error(err.toString());
         });
 
-        connection.on("ReceiverCreate", function (message) {
-            // Reload the page or update the table to show the new item
-            location.reload();
+        connection.on("ReceiverCreate", function (jsonData) {
+            var data = JSON.parse(jsonData);
+            console.log("New item created:", data);
+            
+            // Build new table row dynamically
+            var newRow = `
+                <tr data-id="${data.TicketProcessingVietNid}">
+                    <td>${data.ProcessingCode || ''}</td>
+                    <td>${data.TicketReference || ''}</td>
+                    <td>${data.ProcessingAction || ''}</td>
+                    <td><span title="${data.ActionDescription || ''}">${(data.ActionDescription || '').substring(0, 25)}${(data.ActionDescription || '').length > 25 ? '...' : ''}</span></td>
+                    <td><span class="badge bg-secondary">Low</span></td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>${data.OverdueDays || 0}</td>
+                    <td>${data.EscalationLevel || 0}</td>
+                    <td><i class="bi bi-x-circle text-danger"></i></td>
+                    <td>${data.ProcessedBy || ''}</td>
+                    <td>${data.ProcessedDate ? new Date(data.ProcessedDate).toISOString().split('T')[0] : ''}</td>
+                    <td><span title="${data.ResolvedNote || ''}">${(data.ResolvedNote || '').substring(0, 25)}${(data.ResolvedNote || '').length > 25 ? '...' : ''}</span></td>
+                    <td>${data.CreatedDate ? new Date(data.CreatedDate).toISOString().split('T')[0] : ''}</td>
+                    <td>${data.ModifiedDate ? new Date(data.ModifiedDate).toISOString().split('T')[0] : ''}</td>
+                    <td>${data.TypeName || ''}</td>
+                    <td class="text-center">
+                        <a href="/TicketProcessingVietNs/Details?id=${data.TicketProcessingVietNid}" class="btn btn-sm btn-outline-info me-1" title="View Details">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/TicketProcessingVietNs/Edit?id=${data.TicketProcessingVietNid}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="/TicketProcessingVietNs/Delete?id=${data.TicketProcessingVietNid}" class="btn btn-sm btn-outline-danger" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            `;
+            
+            $('#ticketProcessingTable tbody').prepend(newRow);
+            console.log('New ticket processing record added to table');
         });
 
-        connection.on("ReceiverDelete", function (id) {
-            // Remove the row from the table
-            $('#ticketProcessingTable tbody').find(`tr[data-id='${id}']`).remove();
+        connection.on("ReceiverUpdate", function (jsonData) {
+            var data = JSON.parse(jsonData);
+            console.log("Updated item with ID: " + data.Id);
+            
+            // Find and highlight the updated row
+            var row = $('#ticketProcessingTable tbody').find(`tr[data-id='${data.Id}']`);
+            if (row.length > 0) {
+                row.addClass('table-warning');
+                setTimeout(function() {
+                    row.removeClass('table-warning');
+                }, 2000);
+                console.log('Item with ID ' + data.Id + ' highlighted');
+            }
+        });
+
+        connection.on("ReceiverDelete", function (ticketProcessingVietNid) {
+            // Remove the row from the table - ticketProcessingVietNid is just a string ID
+            $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`).remove();
+            console.log('Removed item with ID: ' + ticketProcessingVietNid);
         });
     </script>
 }

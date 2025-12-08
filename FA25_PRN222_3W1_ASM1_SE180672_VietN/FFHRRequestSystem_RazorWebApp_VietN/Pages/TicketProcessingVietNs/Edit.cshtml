@@ -96,6 +96,9 @@
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <button type="button" id="btnHubUpdate" class="btn btn-warning ms-2">
+                    <i class="bi bi-broadcast"></i> Test SignalR Update
+                </button>
             </div>
         </form>
     </div>
@@ -107,4 +110,33 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script>
+        "use strict";
+        var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
+
+        connection.start().then(function () {
+            console.log("Connected to NotificationHub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        document.getElementById("btnHubUpdate").addEventListener("click", function (event) {
+            var ticketId = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value;
+            var jsonData = JSON.stringify({
+                Id: ticketId,
+                ProcessingCode: document.getElementById("TicketProcessingVietN_ProcessingCode").value
+            });
+
+            connection.invoke("HubUpdate", jsonData).then(function () {
+                alert("SignalR Update notification sent successfully!");
+                console.log("Update notification sent for ID: " + ticketId);
+            }).catch(function (err) {
+                console.error(err.toString());
+                alert("Error sending SignalR notification: " + err.toString());
+            });
+
+            event.preventDefault();
+        });
+    </script>
 }

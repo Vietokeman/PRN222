@@ -196,3 +196,46 @@
         </div>
     </div>
 </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script>
+        "use strict";
+
+        var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
+
+        connection.start().then(function () {
+            console.log("Connected to NotificationHub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        connection.on("ReceiverUpdate", function (jsonData) {
+            var data = JSON.parse(jsonData);
+            var ticketProcessingIdHidden = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value;
+            if (ticketProcessingIdHidden == data.Id) {
+                console.log("Item updated: " + data.Id);
+                // Show update notification without reload
+                var alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+                alertDiv.style.zIndex = '9999';
+                alertDiv.innerHTML = '<strong>Updated!</strong> This item has been updated. <button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                document.body.appendChild(alertDiv);
+                setTimeout(function() { alertDiv.remove(); }, 3000);
+            }
+        });
+
+        connection.on("ReceiverDelete", function (ticketProcessingVietNid) {
+            // ticketProcessingVietNid is just a string ID
+            var ticketProcessingIdHidden = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value;
+            if (ticketProcessingIdHidden == ticketProcessingVietNid) {
+                document.getElementById("ticketProcessingDetailId").innerHTML = "<div class='alert alert-danger text-center'><h4>This item has been deleted</h4><a href='/TicketProcessingVietNs/Index' class='btn btn-primary mt-3'>Back to List</a></div>";
+            }
+        });
+    </script>
+}
+
+@Html.HiddenFor(model => model.TicketProcessingVietN.TicketProcessingVietNid)
+<div id="ticketProcessingDetailId">
+<div class="container-fluid py-4">
