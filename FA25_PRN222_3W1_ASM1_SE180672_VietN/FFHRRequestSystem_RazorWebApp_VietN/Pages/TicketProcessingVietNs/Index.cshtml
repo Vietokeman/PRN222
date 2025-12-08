@@ -11,9 +11,6 @@
             <a asp-page="Create" class="btn btn-success">
                 <i class="bi bi-plus-circle me-1"></i> Create New
             </a>
-            <a asp-page="TestSignalR" class="btn btn-warning">
-                <i class="bi bi-broadcast me-1"></i> Test SignalR
-            </a>
             <a asp-page="/Account/Logout" class="btn btn-outline-danger">
                 <i class="bi bi-box-arrow-right me-1"></i> Logout
             </a>
@@ -199,27 +196,62 @@
             return console.error(err.toString());
         });
 
-        connection.on("ReceiverCreate", function (jsonData) {
-            var data = JSON.parse(jsonData);
-            console.log("New item created:", data);
-            
-            // Build new table row dynamically
-            var newRow = `
+        function parsePayload(payload) {
+            return typeof payload === 'string' ? JSON.parse(payload) : payload;
+        }
+
+        function buildBadge(value, map) {
+            const def = map.default || { text: '', cls: '' };
+            return map[value] || def;
+        }
+
+        function formatDate(dateValue) {
+            if (!dateValue) return '';
+            const date = new Date(dateValue);
+            if (Number.isNaN(date.getTime())) return '';
+            return date.toISOString().split('T')[0];
+        }
+
+        function truncate(text, length) {
+            if (!text) return '';
+            return text.length > length ? text.substring(0, length) + '...' : text;
+        }
+
+        function renderRow(data) {
+            const priority = buildBadge(data.PriorityLevel, {
+                3: { text: 'High', cls: 'bg-danger' },
+                2: { text: 'Medium', cls: 'bg-warning text-dark' },
+                1: { text: 'Low', cls: 'bg-secondary' },
+                default: { text: 'Unknown', cls: 'bg-light text-dark' }
+            });
+
+            const status = buildBadge(data.Status, {
+                1: { text: 'Active', cls: 'bg-success' },
+                2: { text: 'Resolved', cls: 'bg-info' },
+                3: { text: 'Closed', cls: 'bg-secondary' },
+                default: { text: 'Unknown', cls: 'bg-light text-dark' }
+            });
+
+            const autoBadge = data.IsAutoProcessed
+                ? '<span class="badge bg-info text-dark">Auto</span>'
+                : '<span class="badge bg-dark">Manual</span>';
+
+            return `
                 <tr data-id="${data.TicketProcessingVietNid}">
                     <td>${data.ProcessingCode || ''}</td>
                     <td>${data.TicketReference || ''}</td>
                     <td>${data.ProcessingAction || ''}</td>
-                    <td><span title="${data.ActionDescription || ''}">${(data.ActionDescription || '').substring(0, 25)}${(data.ActionDescription || '').length > 25 ? '...' : ''}</span></td>
-                    <td><span class="badge bg-secondary">Low</span></td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>${data.OverdueDays || 0}</td>
-                    <td>${data.EscalationLevel || 0}</td>
-                    <td><i class="bi bi-x-circle text-danger"></i></td>
+                    <td><span title="${data.ActionDescription || ''}">${truncate(data.ActionDescription, 25)}</span></td>
+                    <td><span class="badge ${priority.cls}">${priority.text}</span></td>
+                    <td><span class="badge ${status.cls}">${status.text}</span></td>
+                    <td>${data.OverdueDays ?? ''}</td>
+                    <td>${data.EscalationLevel ?? ''}</td>
+                    <td>${autoBadge}</td>
                     <td>${data.ProcessedBy || ''}</td>
-                    <td>${data.ProcessedDate ? new Date(data.ProcessedDate).toISOString().split('T')[0] : ''}</td>
-                    <td><span title="${data.ResolvedNote || ''}">${(data.ResolvedNote || '').substring(0, 25)}${(data.ResolvedNote || '').length > 25 ? '...' : ''}</span></td>
-                    <td>${data.CreatedDate ? new Date(data.CreatedDate).toISOString().split('T')[0] : ''}</td>
-                    <td>${data.ModifiedDate ? new Date(data.ModifiedDate).toISOString().split('T')[0] : ''}</td>
+                    <td>${formatDate(data.ProcessedDate)}</td>
+                    <td><span title="${data.ResolvedNote || ''}">${truncate(data.ResolvedNote, 25)}</span></td>
+                    <td>${formatDate(data.CreatedDate)}</td>
+                    <td>${formatDate(data.ModifiedDate)}</td>
                     <td>${data.TypeName || ''}</td>
                     <td class="text-center">
                         <a href="/TicketProcessingVietNs/Details?id=${data.TicketProcessingVietNid}" class="btn btn-sm btn-outline-info me-1" title="View Details">
@@ -232,32 +264,28 @@
                             <i class="bi bi-trash"></i>
                         </a>
                     </td>
-                </tr>
-            `;
-            
+                </tr>`;
+        }
+
+        connection.on("ReceiverCreate", function (payload) {
+            const data = parsePayload(payload);
+            if (!data) return;
+            const newRow = renderRow(data);
             $('#ticketProcessingTable tbody').prepend(newRow);
-            console.log('New ticket processing record added to table');
         });
 
-        connection.on("ReceiverUpdate", function (jsonData) {
-            var data = JSON.parse(jsonData);
-            console.log("Updated item with ID: " + data.Id);
-            
-            // Find and highlight the updated row
-            var row = $('#ticketProcessingTable tbody').find(`tr[data-id='${data.Id}']`);
+        connection.on("ReceiverUpdate", function (payload) {
+            const data = parsePayload(payload);
+            if (!data) return;
+            const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${data.TicketProcessingVietNid}']`);
+            const newRow = renderRow(data);
             if (row.length > 0) {
-                row.addClass('table-warning');
-                setTimeout(function() {
-                    row.removeClass('table-warning');
-                }, 2000);
-                console.log('Item with ID ' + data.Id + ' highlighted');
+                row.replaceWith(newRow);
             }
         });
 
         connection.on("ReceiverDelete", function (ticketProcessingVietNid) {
-            // Remove the row from the table - ticketProcessingVietNid is just a string ID
             $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`).remove();
-            console.log('Removed item with ID: ' + ticketProcessingVietNid);
         });
     </script>
 }

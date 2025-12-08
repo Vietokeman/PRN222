@@ -33,7 +33,7 @@
     };
 }
 
-<div class="container-fluid py-4">
+<div id="ticketProcessingDetailId" class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-primary">
             <i class="bi bi-ticket-detailed me-2"></i>Ticket Processing Details
@@ -48,6 +48,8 @@
         </div>
     </div>
 
+    @Html.HiddenFor(model => model.TicketProcessingVietN.TicketProcessingVietNid)
+
     <!-- Basic Information Card -->
     <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white">
@@ -60,19 +62,19 @@
                 <div class="col-md-4">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Processing Code</label>
-                        <p class="mb-0 fs-5">@Model.TicketProcessingVietN.ProcessingCode</p>
+                        <p class="mb-0 fs-5" id="detail-processingCode">@Model.TicketProcessingVietN.ProcessingCode</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Ticket Reference</label>
-                        <p class="mb-0 fs-5">@Model.TicketProcessingVietN.TicketReference</p>
+                        <p class="mb-0 fs-5" id="detail-ticketReference">@Model.TicketProcessingVietN.TicketReference</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Processing Type</label>
-                        <p class="mb-0 fs-5">@Model.TicketProcessingVietN.ProcessingTypeVietN?.TypeName</p>
+                        <p class="mb-0 fs-5" id="detail-processingType">@Model.TicketProcessingVietN.ProcessingTypeVietN?.TypeName</p>
                     </div>
                 </div>
             </div>
@@ -91,20 +93,20 @@
                 <div class="col-md-6">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Processing Action</label>
-                        <p class="mb-0">@Model.TicketProcessingVietN.ProcessingAction</p>
+                        <p class="mb-0" id="detail-processingAction">@Model.TicketProcessingVietN.ProcessingAction</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Action Description</label>
-                        <p class="mb-0">@Model.TicketProcessingVietN.ActionDescription</p>
+                        <p class="mb-0" id="detail-actionDescription">@Model.TicketProcessingVietN.ActionDescription</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Priority Level</label>
                         <p class="mb-0">
-                            <span class="badge @priorityClass fs-6">@priorityText</span>
+                            <span class="badge @priorityClass fs-6" id="detail-priority">@priorityText</span>
                         </p>
                     </div>
                 </div>
@@ -112,20 +114,20 @@
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Status</label>
                         <p class="mb-0">
-                            <span class="badge @statusClass fs-6">@statusText</span>
+                            <span class="badge @statusClass fs-6" id="detail-status">@statusText</span>
                         </p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Overdue Days</label>
-                        <p class="mb-0">@Model.TicketProcessingVietN.OverdueDays</p>
+                        <p class="mb-0" id="detail-overdue">@Model.TicketProcessingVietN.OverdueDays</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Escalation Level</label>
-                        <p class="mb-0">@Model.TicketProcessingVietN.EscalationLevel</p>
+                        <p class="mb-0" id="detail-escalation">@Model.TicketProcessingVietN.EscalationLevel</p>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -134,11 +136,11 @@
                         <p class="mb-0">
                             @if (Model.TicketProcessingVietN.IsAutoProcessed)
                             {
-                                <span class="badge bg-info text-dark">Automatic</span>
+                                <span class="badge bg-info text-dark" id="detail-auto">Automatic</span>
                             }
                             else
                             {
-                                <span class="badge bg-dark">Manual</span>
+                                <span class="badge bg-dark" id="detail-auto">Manual</span>
                             }
                         </p>
                     </div>
@@ -146,7 +148,7 @@
                 <div class="col-md-6">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Processed By</label>
-                        <p class="mb-0">@Model.TicketProcessingVietN.ProcessedBy</p>
+                        <p class="mb-0" id="detail-processedBy">@Model.TicketProcessingVietN.ProcessedBy</p>
                     </div>
                 </div>
             </div>
@@ -165,37 +167,36 @@
                 <div class="col-md-3">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Created Date</label>
-                        <p class="mb-0">@Model.TicketProcessingVietN.CreatedDate?.ToString("dddd, MMMM dd, yyyy")</p>
+                        <p class="mb-0" id="detail-createdDate">@Model.TicketProcessingVietN.CreatedDate?.ToString("dddd, MMMM dd, yyyy")</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Modified Date</label>
-                        <p class="mb-0">@Model.TicketProcessingVietN.ModifiedDate?.ToString("dddd, MMMM dd, yyyy")</p>
+                        <p class="mb-0" id="detail-modifiedDate">@Model.TicketProcessingVietN.ModifiedDate?.ToString("dddd, MMMM dd, yyyy")</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Processed Date</label>
-                        <p class="mb-0">@Model.TicketProcessingVietN.ProcessedDate?.ToString("dddd, MMMM dd, yyyy")</p>
+                        <p class="mb-0" id="detail-processedDate">@Model.TicketProcessingVietN.ProcessedDate?.ToString("dddd, MMMM dd, yyyy")</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="border rounded p-3 h-100">
                         <label class="form-label fw-bold text-muted">Related Ticket Code</label>
-                        <p class="mb-0">@Model.TicketProcessingVietN.RelatedTicketCode</p>
+                        <p class="mb-0" id="detail-relatedTicketCode">@Model.TicketProcessingVietN.RelatedTicketCode</p>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="border rounded p-3">
                         <label class="form-label fw-bold text-muted">Resolved Note</label>
-                        <p class="mb-0">@Model.TicketProcessingVietN.ResolvedNote</p>
+                        <p class="mb-0" id="detail-resolvedNote">@Model.TicketProcessingVietN.ResolvedNote</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 
 @section Scripts {
@@ -211,31 +212,77 @@
             return console.error(err.toString());
         });
 
-        connection.on("ReceiverUpdate", function (jsonData) {
-            var data = JSON.parse(jsonData);
-            var ticketProcessingIdHidden = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value;
-            if (ticketProcessingIdHidden == data.Id) {
-                console.log("Item updated: " + data.Id);
-                // Show update notification without reload
-                var alertDiv = document.createElement('div');
-                alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
-                alertDiv.style.zIndex = '9999';
-                alertDiv.innerHTML = '<strong>Updated!</strong> This item has been updated. <button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
-                document.body.appendChild(alertDiv);
-                setTimeout(function() { alertDiv.remove(); }, 3000);
+        function parsePayload(payload) {
+            return typeof payload === 'string' ? JSON.parse(payload) : payload;
+        }
+
+        function formatDateText(dateValue) {
+            if (!dateValue) return '';
+            const date = new Date(dateValue);
+            if (Number.isNaN(date.getTime())) return '';
+            return date.toLocaleDateString();
+        }
+
+        function setBadge(elementId, text, cls) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.textContent = text;
+            el.className = `badge fs-6 ${cls}`.trim();
+        }
+
+        function setText(elementId, value) {
+            const el = document.getElementById(elementId);
+            if (el) el.textContent = value ?? '';
+        }
+
+        connection.on("ReceiverUpdate", function (payload) {
+            const data = parsePayload(payload);
+            const ticketProcessingIdHidden = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid")?.value;
+            if (!data || ticketProcessingIdHidden !== data.TicketProcessingVietNid) return;
+
+            setText("detail-processingCode", data.ProcessingCode);
+            setText("detail-ticketReference", data.TicketReference);
+            setText("detail-processingType", data.TypeName);
+            setText("detail-processingAction", data.ProcessingAction);
+            setText("detail-actionDescription", data.ActionDescription);
+            setText("detail-overdue", data.OverdueDays);
+            setText("detail-escalation", data.EscalationLevel);
+            setText("detail-processedBy", data.ProcessedBy);
+            setText("detail-createdDate", formatDateText(data.CreatedDate));
+            setText("detail-modifiedDate", formatDateText(data.ModifiedDate));
+            setText("detail-processedDate", formatDateText(data.ProcessedDate));
+            setText("detail-relatedTicketCode", data.RelatedTicketCode);
+            setText("detail-resolvedNote", data.ResolvedNote);
+
+            const priorityMap = {
+                3: { text: 'High', cls: 'bg-danger' },
+                2: { text: 'Medium', cls: 'bg-warning text-dark' },
+                1: { text: 'Low', cls: 'bg-secondary' }
+            };
+            const statusMap = {
+                1: { text: 'Active', cls: 'bg-success' },
+                2: { text: 'Resolved', cls: 'bg-info' },
+                3: { text: 'Closed', cls: 'bg-secondary' }
+            };
+
+            const priority = priorityMap[data.PriorityLevel] || { text: 'Unknown', cls: 'bg-light text-dark' };
+            const status = statusMap[data.Status] || { text: 'Unknown', cls: 'bg-light text-dark' };
+
+            setBadge("detail-priority", priority.text, priority.cls);
+            setBadge("detail-status", status.text, status.cls);
+
+            const autoEl = document.getElementById("detail-auto");
+            if (autoEl) {
+                autoEl.textContent = data.IsAutoProcessed ? "Automatic" : "Manual";
+                autoEl.className = data.IsAutoProcessed ? "badge bg-info text-dark" : "badge bg-dark";
             }
         });
 
         connection.on("ReceiverDelete", function (ticketProcessingVietNid) {
-            // ticketProcessingVietNid is just a string ID
-            var ticketProcessingIdHidden = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value;
+            var ticketProcessingIdHidden = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid")?.value;
             if (ticketProcessingIdHidden == ticketProcessingVietNid) {
                 document.getElementById("ticketProcessingDetailId").innerHTML = "<div class='alert alert-danger text-center'><h4>This item has been deleted</h4><a href='/TicketProcessingVietNs/Index' class='btn btn-primary mt-3'>Back to List</a></div>";
             }
         });
     </script>
 }
-
-@Html.HiddenFor(model => model.TicketProcessingVietN.TicketProcessingVietNid)
-<div id="ticketProcessingDetailId">
-<div class="container-fluid py-4">

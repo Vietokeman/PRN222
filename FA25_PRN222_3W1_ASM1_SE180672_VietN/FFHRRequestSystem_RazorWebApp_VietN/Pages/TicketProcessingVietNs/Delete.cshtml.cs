@@ -4,7 +4,6 @@ using FFHRRequestSystem.Services.VietN;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,12 +16,10 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
     public class DeleteModel : PageModel
     {
         private readonly TicketProcessingVietNService _service;
-        private readonly IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.NotificationHub> _hubContext;
 
-        public DeleteModel(TicketProcessingVietNService service, IHubContext<FFHRRequestSystem_RazorWebApp_VietN.Hubs.NotificationHub> hubContext)
+        public DeleteModel(TicketProcessingVietNService service)
         {
             _service = service;
-            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -50,19 +47,17 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
 
         public async Task<IActionResult> OnPostAsync(Guid? id)
         {
-            if (id == null)
+            var deleteId = id ?? TicketProcessingVietN?.TicketProcessingVietNid;
+            if (deleteId == null)
             {
                 return NotFound();
             }
 
-            var result = _service.DeleteAsync(id.Value);
-            if (result == null)
+            var result = await _service.DeleteAsync(deleteId.Value);
+            if (!result)
             {
                 return Page();
             }
-
-            // Notify all clients about the deleted ticket processing
-            await _hubContext.Clients.All.SendAsync("ReceiverDelete", id.Value.ToString());
 
             return RedirectToPage("./Index");
         }

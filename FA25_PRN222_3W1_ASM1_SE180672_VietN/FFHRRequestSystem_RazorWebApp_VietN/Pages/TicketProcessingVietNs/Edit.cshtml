@@ -97,7 +97,7 @@
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
                 <button type="button" id="btnHubUpdate" class="btn btn-warning ms-2">
-                    <i class="bi bi-broadcast"></i> Test SignalR Update
+                    <i class="bi bi-broadcast"></i> Update via SignalR
                 </button>
             </div>
         </form>
@@ -113,30 +113,43 @@
     <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script>
         "use strict";
+
         var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
 
         connection.start().then(function () {
-            console.log("Connected to NotificationHub");
+            console.log("Connected to NotificationHub (edit)");
         }).catch(function (err) {
             return console.error(err.toString());
         });
 
-        document.getElementById("btnHubUpdate").addEventListener("click", function (event) {
-            var ticketId = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value;
-            var jsonData = JSON.stringify({
-                Id: ticketId,
-                ProcessingCode: document.getElementById("TicketProcessingVietN_ProcessingCode").value
-            });
-
-            connection.invoke("HubUpdate", jsonData).then(function () {
-                alert("SignalR Update notification sent successfully!");
-                console.log("Update notification sent for ID: " + ticketId);
-            }).catch(function (err) {
-                console.error(err.toString());
-                alert("Error sending SignalR notification: " + err.toString());
-            });
-
+        const btnHubUpdate = document.getElementById("btnHubUpdate");
+        btnHubUpdate?.addEventListener("click", function (event) {
             event.preventDefault();
+
+            var dataObj = JSON.stringify({
+                TicketProcessingVietNid: document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value,
+                ProcessingCode: document.getElementById("TicketProcessingVietN_ProcessingCode").value,
+                TicketReference: document.getElementById("TicketProcessingVietN_TicketReference").value,
+                ProcessingTypeVietNid: document.getElementById("TicketProcessingVietN_ProcessingTypeVietNid").value,
+                ProcessingAction: document.getElementById("TicketProcessingVietN_ProcessingAction").value,
+                ActionDescription: document.getElementById("TicketProcessingVietN_ActionDescription").value,
+                RelatedTicketCode: document.getElementById("TicketProcessingVietN_RelatedTicketCode").value,
+                PriorityLevel: document.getElementById("TicketProcessingVietN_PriorityLevel").value,
+                Status: document.getElementById("TicketProcessingVietN_Status").value,
+                OverdueDays: document.getElementById("TicketProcessingVietN_OverdueDays").value,
+                EscalationLevel: document.getElementById("TicketProcessingVietN_EscalationLevel").value,
+                IsAutoProcessed: document.getElementById("TicketProcessingVietN_IsAutoProcessed").checked,
+                ProcessedBy: document.getElementById("TicketProcessingVietN_ProcessedBy").value,
+                ProcessedDate: document.getElementById("TicketProcessingVietN_ProcessedDate").value,
+                ResolvedNote: document.getElementById("TicketProcessingVietN_ResolvedNote").value,
+                CreatedDate: document.getElementById("TicketProcessingVietN_CreatedDate").value,
+                ModifiedDate: document.getElementById("TicketProcessingVietN_ModifiedDate").value,
+                TypeName: document.querySelector("#TicketProcessingVietN_ProcessingTypeVietNid option:checked")?.text || ""
+            });
+
+            connection.invoke("HubUpdate", dataObj).catch(function (err) {
+                return console.error(err.toString());
+            });
         });
     </script>
 }
