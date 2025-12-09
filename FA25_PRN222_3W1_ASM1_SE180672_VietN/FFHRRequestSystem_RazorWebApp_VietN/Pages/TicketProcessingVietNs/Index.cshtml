@@ -177,13 +177,19 @@
     <script src="~/table-pagination.js"></script>
     <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script>
+        var paginationSettings = {
+            rowPerPage: 10,  
+            paginationColor: '#007bff',  
+            fontColor: '#333',  
+            transitionDuration: 300  
+        };
+
+        function initPagination() {
+            $('#ticketProcessingTable').createTablePagination(paginationSettings);
+        }
+
         $(document).ready(function() {
-            $('#ticketProcessingTable').createTablePagination({
-                rowPerPage: 10,  
-                paginationColor: '#007bff',  
-                fontColor: '#333',  
-                transitionDuration: 300  
-            });
+            initPagination();
         });
 
         "use strict";
@@ -252,7 +258,7 @@
                     <td><span title="${data.ResolvedNote || ''}">${truncate(data.ResolvedNote, 25)}</span></td>
                     <td>${formatDate(data.CreatedDate)}</td>
                     <td>${formatDate(data.ModifiedDate)}</td>
-                    <td>${data.TypeName || ''}</td>
+                    <td>${data.ProcessingTypeVietN?.TypeName || data.TypeName || ''}</td>
                     <td class="text-center">
                         <a href="/TicketProcessingVietNs/Details?id=${data.TicketProcessingVietNid}" class="btn btn-sm btn-outline-info me-1" title="View Details">
                             <i class="bi bi-eye"></i>
@@ -270,8 +276,15 @@
         connection.on("ReceiverCreate", function (payload) {
             const data = parsePayload(payload);
             if (!data) return;
+            
+            // Add new row at the top (pagination will handle visibility)
             const newRow = renderRow(data);
             $('#ticketProcessingTable tbody').prepend(newRow);
+            
+            // Highlight the new row briefly
+            $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
+                .css('background-color', '#d4edda')
+                .animate({ backgroundColor: 'transparent' }, 2000);
         });
 
         connection.on("ReceiverUpdate", function (payload) {
@@ -281,6 +294,11 @@
             const newRow = renderRow(data);
             if (row.length > 0) {
                 row.replaceWith(newRow);
+                
+                // Highlight updated row
+                $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
+                    .css('background-color', '#fff3cd')
+                    .animate({ backgroundColor: 'transparent' }, 2000);
             }
         });
 

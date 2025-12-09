@@ -30,7 +30,9 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Hubs
             var result = await _service.CreateAsync(entity);
             if (result > 0)
             {
-                var payload = JsonConvert.SerializeObject(entity);
+                // Reload entity with navigation properties to get TypeName
+                var savedEntity = await _service.GetByIdAsync(entity.TicketProcessingVietNid);
+                var payload = JsonConvert.SerializeObject(savedEntity);
                 await Clients.All.SendAsync("ReceiverCreate", payload);
             }
         }
@@ -47,7 +49,9 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Hubs
             var result = await _service.UpdateAsync(entity);
             if (result > 0)
             {
-                var payload = JsonConvert.SerializeObject(entity);
+                // Reload entity with navigation properties to get TypeName
+                var updatedEntity = await _service.GetByIdAsync(entity.TicketProcessingVietNid);
+                var payload = JsonConvert.SerializeObject(updatedEntity);
                 await Clients.All.SendAsync("ReceiverUpdate", payload);
             }
         }
