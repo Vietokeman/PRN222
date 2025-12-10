@@ -153,8 +153,49 @@
             $('#ticketProcessingTable').createTablePagination(paginationSettings);
         }
 
+        // Toast notification helper
+        function showToast(message, type = 'success') {
+            const bgColors = {
+                success: 'linear-gradient(to right, #00b09b, #96c93d)',
+                error: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                info: 'linear-gradient(to right, #4facfe, #00f2fe)',
+                warning: 'linear-gradient(to right, #f093fb, #f5576c)'
+            };
+
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: bgColors[type] || bgColors.success,
+                },
+                stopOnFocus: true,
+            }).showToast();
+        }
+
         $(document).ready(function() {
             initPagination();
+            
+            // Show TempData messages
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                showToast('@TempData["SuccessMessage"]', 'success');
+                </text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                showToast('@TempData["ErrorMessage"]', 'error');
+                </text>
+            }
+            @if (TempData["InfoMessage"] != null)
+            {
+                <text>
+                showToast('@TempData["InfoMessage"]', 'info');
+                </text>
+            }
             
             // Quick search functionality
             $('#quickSearch').on('keyup', function() {
@@ -267,6 +308,7 @@
             
             if (!data) {
                 console.error("❌ Failed to parse data");
+                showToast("Failed to create ticket - Invalid data", "error");
                 return;
             }
             
@@ -286,6 +328,7 @@
                 .css('background-color', '#d4edda')
                 .animate({ backgroundColor: 'transparent' }, 2000);
             
+            showToast(`✅ Ticket "${data.ProcessingCode}" created successfully via SignalR!`, "success");
             console.log("✨ ReceiverCreate completed!");
         });
 
@@ -298,6 +341,7 @@
             
             if (!data) {
                 console.error("❌ Failed to parse data");
+                showToast("Failed to update ticket - Invalid data", "error");
                 return;
             }
             
@@ -320,9 +364,11 @@
                     .css('background-color', '#fff3cd')
                     .animate({ backgroundColor: 'transparent' }, 2000);
                 
+                showToast(`✅ Ticket "${data.ProcessingCode}" updated successfully via SignalR!`, "info");
                 console.log("✨ ReceiverUpdate completed!");
             } else {
                 console.warn("⚠️ Row not found, cannot update");
+                showToast("Ticket not found in table", "warning");
             }
         });
 
@@ -333,13 +379,20 @@
             const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`);
             console.log("🔍 Found row:", row.length > 0 ? "Yes" : "No");
             
-            row.remove();
-            console.log("✅ Row deleted successfully");
-            
-            // Reinitialize pagination to update page count after deletion
-            initPagination();
-            console.log("♻️ Pagination refreshed");
-            console.log("✨ ReceiverDelete completed!");
+            if (row.length > 0) {
+                row.remove();
+                console.log("✅ Row deleted successfully");
+                
+                // Reinitialize pagination to update page count after deletion
+                initPagination();
+                console.log("♻️ Pagination refreshed");
+                
+                showToast("🗑️ Ticket deleted successfully via SignalR!", "warning");
+                console.log("✨ ReceiverDelete completed!");
+            } else {
+                console.warn("⚠️ Row not found, cannot delete");
+                showToast("Ticket not found in table", "error");
+            }
         });
     </script>
 }

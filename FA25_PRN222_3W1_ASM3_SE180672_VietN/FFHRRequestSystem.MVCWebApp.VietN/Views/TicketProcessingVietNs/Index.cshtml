@@ -74,7 +74,6 @@
                     <th>Escalation</th>
                     <th>Auto</th>
                     <th>Processed By</th>
-                    <th>Processed Date</th>
                     <th>Resolved Note</th>
                     <th>Created</th>
                     <th>Modified</th>
@@ -143,7 +142,6 @@
                             }
                         </td>
                         <td>@item.ProcessedBy</td>
-                        <td>@item.ProcessedDate?.ToString("yyyy-MM-dd")</td>
                         <td>
                             <span title="@item.ResolvedNote">
                                 @(item.ResolvedNote?.Length > 20 ? item.ResolvedNote.Substring(0, 20) + "..." : item.ResolvedNote)
@@ -188,8 +186,49 @@
             $('#ticketProcessingTable').createTablePagination(paginationSettings);
         }
 
+        // Toast notification helper
+        function showToast(message, type = 'success') {
+            const bgColors = {
+                success: 'linear-gradient(to right, #00b09b, #96c93d)',
+                error: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                info: 'linear-gradient(to right, #4facfe, #00f2fe)',
+                warning: 'linear-gradient(to right, #f093fb, #f5576c)'
+            };
+
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: bgColors[type] || bgColors.success,
+                },
+                stopOnFocus: true,
+            }).showToast();
+        }
+
         $(document).ready(function() {
             initPagination();
+            
+            // Show TempData messages
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                showToast('@TempData["SuccessMessage"]', 'success');
+                </text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                showToast('@TempData["ErrorMessage"]', 'error');
+                </text>
+            }
+            @if (TempData["InfoMessage"] != null)
+            {
+                <text>
+                showToast('@TempData["InfoMessage"]', 'info');
+                </text>
+            }
             
             // Quick search functionality
             $('#quickSearch').on('keyup', function() {
@@ -214,8 +253,10 @@
         var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
 
         connection.start().then(function () {
-            console.log("Connected to NotificationHub");
+            console.log("✅ Connected to NotificationHub");
+            console.log("Connection ID:", connection.connectionId);
         }).catch(function (err) {
+            console.error("❌ Connection failed:", err.toString());
             return console.error(err.toString());
         });
 
@@ -271,7 +312,6 @@
                     <td>${data.EscalationLevel ?? ''}</td>
                     <td>${autoBadge}</td>
                     <td>${data.ProcessedBy || ''}</td>
-                    <td>${formatDate(data.ProcessedDate)}</td>
                     <td><span title="${data.ResolvedNote || ''}">${truncate(data.ResolvedNote, 25)}</span></td>
                     <td>${formatDate(data.CreatedDate)}</td>
                     <td>${formatDate(data.ModifiedDate)}</td>
@@ -293,45 +333,99 @@
         }
 
         connection.on("ReceiverCreate", function (payload) {
+            console.log("🔔 ReceiverCreate triggered!");
+            console.log("📦 Raw payload:", payload);
+            
             const data = parsePayload(payload);
-            if (!data) return;
+            console.log("✅ Parsed entity:", data);
+            
+            if (!data) {
+                console.error("❌ Failed to parse data");
+                showToast("Failed to create ticket - Invalid data", "error");
+                return;
+            }
             
             // Add new row at the top
             const newRow = renderRow(data);
+            console.log("📝 Generated row HTML:", newRow);
+            
             $('#ticketProcessingTable tbody').prepend(newRow);
+            console.log("✅ Row inserted successfully");
             
             // Reinitialize pagination to update page count and show new row
             initPagination();
+            console.log("♻️ Pagination refreshed");
             
             // Highlight the new row briefly
             $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
                 .css('background-color', '#d4edda')
                 .animate({ backgroundColor: 'transparent' }, 2000);
+            
+            showToast(`✅ Ticket "${data.ProcessingCode}" created successfully via SignalR!`, "success");
+            console.log("✨ ReceiverCreate completed!");
         });
 
         connection.on("ReceiverUpdate", function (payload) {
+            console.log("🔔 ReceiverUpdate triggered!");
+            console.log("📦 Raw payload:", payload);
+            
             const data = parsePayload(payload);
-            if (!data) return;
+            console.log("✅ Parsed entity:", data);
+            
+            if (!data) {
+                console.error("❌ Failed to parse data");
+                showToast("Failed to update ticket - Invalid data", "error");
+                return;
+            }
+            
             const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${data.TicketProcessingVietNid}']`);
+            console.log("🔍 Found row:", row.length > 0 ? "Yes" : "No");
+            
             const newRow = renderRow(data);
+            console.log("📝 Generated row HTML:", newRow);
+            
             if (row.length > 0) {
                 row.replaceWith(newRow);
+                console.log("✅ Row replaced successfully");
                 
                 // Reinitialize pagination to update display
                 initPagination();
+                console.log("♻️ Pagination refreshed");
                 
                 // Highlight updated row
                 $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
                     .css('background-color', '#fff3cd')
                     .animate({ backgroundColor: 'transparent' }, 2000);
+                
+                showToast(`✅ Ticket "${data.ProcessingCode}" updated successfully via SignalR!`, "info");
+                console.log("✨ ReceiverUpdate completed!");
+            } else {
+                console.warn("⚠️ Row not found, cannot update");
+                showToast("Ticket not found in table", "warning");
             }
         });
 
         connection.on("ReceiverDelete", function (ticketProcessingVietNid) {
-            $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`).remove();
+            console.log("🔔 ReceiverDelete triggered!");
+            console.log("🗑️ Deleting ID:", ticketProcessingVietNid);
             
-            // Reinitialize pagination to update page count after deletion
-            initPagination();
+            const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`);
+            console.log("🔍 Found row:", row.length > 0 ? "Yes" : "No");
+            
+            if (row.length > 0) {
+                row.remove();
+                console.log("✅ Row deleted successfully");
+                
+                // Reinitialize pagination to update page count after deletion
+                initPagination();
+                console.log("♻️ Pagination refreshed");
+                
+                showToast("🗑️ Ticket deleted successfully via SignalR!", "warning");
+                console.log("✨ ReceiverDelete completed!");
+            } else {
+                console.warn("⚠️ Row not found, cannot delete");
+                showToast("Ticket not found in table", "error");
+            }
         });
     </script>
 }

@@ -62,12 +62,18 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
                     var result = await _ticketService.CreateAsync(TicketProcessingVietN);
                     if (result > 0)
                     {
+                        TempData["SuccessMessage"] = $"✅ Ticket '{TicketProcessingVietN.ProcessingCode}' created successfully!";
                         return RedirectToPage("./Index");
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "❌ Failed to create ticket. Please try again.";
                     }
                 }
                 catch (Exception ex)
                 {
                     // Log the detailed error
+                    TempData["ErrorMessage"] = $"❌ Error creating ticket: {ex.Message}";
                     ModelState.AddModelError(string.Empty, $"Error creating record: {ex.Message}");
                     if (ex.InnerException != null)
                     {

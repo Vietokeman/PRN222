@@ -165,11 +165,35 @@
     <script>
         "use strict";
 
+        // Toast notification helper
+        function showToast(message, type = 'success') {
+            const bgColors = {
+                success: 'linear-gradient(to right, #00b09b, #96c93d)',
+                error: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                info: 'linear-gradient(to right, #4facfe, #00f2fe)',
+                warning: 'linear-gradient(to right, #f093fb, #f5576c)'
+            };
+
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: bgColors[type] || bgColors.success,
+                },
+                stopOnFocus: true,
+            }).showToast();
+        }
+
         var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
 
         connection.start().then(function () {
             console.log("Connected to NotificationHub (create)");
+            showToast("✅ Connected to real-time updates", "info");
         }).catch(function (err) {
+            console.error(err.toString());
+            showToast("❌ Failed to connect to real-time updates", "error");
             return console.error(err.toString());
         });
 
@@ -197,9 +221,23 @@
                 TypeName: document.querySelector("#TicketProcessingVietN_ProcessingTypeVietNid option:checked")?.text || ""
             });
 
-            connection.invoke("HubCreate", dataObj).catch(function (err) {
-                return console.error(err.toString());
-            });
+            showToast("📤 Sending ticket creation request...", "info");
+            
+            connection.invoke("HubCreate", dataObj)
+                .then(function() {
+                    console.log("✅ HubCreate invoked successfully");
+                    showToast("✅ Ticket creation request sent! Check Index page for updates.", "success");
+                    
+                    // Optionally redirect after 2 seconds
+                    setTimeout(function() {
+                        window.location.href = '/TicketProcessingVietNs';
+                    }, 2000);
+                })
+                .catch(function (err) {
+                    console.error(err.toString());
+                    showToast("❌ Failed to create ticket: " + err.toString(), "error");
+                    return console.error(err.toString());
+                });
         });
 
         function generateGuid() {

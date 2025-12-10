@@ -53,6 +53,7 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
         {
             if (!ModelState.IsValid)
             {
+                TempData["ErrorMessage"] = "❌ Invalid form data. Please check your input.";
                 return Page();
             }
             TicketProcessingVietN.ModifiedDate = DateTime.Now;
@@ -63,9 +64,11 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
 
             if (result > 0)
             {
+                TempData["SuccessMessage"] = $"✅ Ticket '{TicketProcessingVietN.ProcessingCode}' updated successfully!";
                 return RedirectToPage("./Index");
             }
 
+            TempData["ErrorMessage"] = $"❌ Failed to update ticket '{TicketProcessingVietN.ProcessingCode}'.";
             var processingTypes = await _typeService.GetAllAsync();
             ViewData["ProcessingTypeVietNid"] = new SelectList(processingTypes, "ProcessingTypeVietNid", "TypeName");
             return Page();
