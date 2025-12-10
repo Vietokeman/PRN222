@@ -9,7 +9,7 @@
     <h1><i class="bi bi-ticket-perforated"></i> Tickets Management</h1>
     <div class="header-actions">
         <div class="search-box">
-            <input type="text" placeholder="Search..." />
+            <input type="text" id="quickSearch" placeholder="Search..." />
             <i class="bi bi-search"></i>
         </div>
         <button class="notification-btn">
@@ -190,6 +190,23 @@
 
         $(document).ready(function() {
             initPagination();
+            
+            // Quick search functionality
+            $('#quickSearch').on('keyup', function() {
+                var searchTerm = $(this).val().toLowerCase();
+                
+                $('#ticketProcessingTable tbody tr').each(function() {
+                    var rowText = $(this).text().toLowerCase();
+                    if (rowText.indexOf(searchTerm) === -1) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
+                });
+                
+                // Reinitialize pagination after search
+                initPagination();
+            });
         });
 
         "use strict";
@@ -279,9 +296,12 @@
             const data = parsePayload(payload);
             if (!data) return;
             
-            // Add new row at the top (pagination will handle visibility)
+            // Add new row at the top
             const newRow = renderRow(data);
             $('#ticketProcessingTable tbody').prepend(newRow);
+            
+            // Reinitialize pagination to update page count and show new row
+            initPagination();
             
             // Highlight the new row briefly
             $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
@@ -297,6 +317,9 @@
             if (row.length > 0) {
                 row.replaceWith(newRow);
                 
+                // Reinitialize pagination to update display
+                initPagination();
+                
                 // Highlight updated row
                 $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
                     .css('background-color', '#fff3cd')
@@ -306,6 +329,9 @@
 
         connection.on("ReceiverDelete", function (ticketProcessingVietNid) {
             $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`).remove();
+            
+            // Reinitialize pagination to update page count after deletion
+            initPagination();
         });
     </script>
 }

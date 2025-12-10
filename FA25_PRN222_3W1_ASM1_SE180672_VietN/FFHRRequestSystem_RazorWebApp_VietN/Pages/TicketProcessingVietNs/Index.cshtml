@@ -9,14 +9,14 @@
     <h1><i class="bi bi-ticket-perforated"></i> Tickets Management</h1>
     <div class="header-actions">
         <div class="search-box">
-            <input type="text" placeholder="Search..." />
+            <input type="text" id="quickSearch" placeholder="Search..." />
             <i class="bi bi-search"></i>
         </div>
         <button class="notification-btn">
             <i class="bi bi-bell"></i>
             <span class="notification-badge">3</span>
         </button>
-        <a href="./Create" class="btn-add-new">
+        <a asp-page="./Create" class="btn-add-new">
             <i class="bi bi-plus-circle"></i> ADD NEW TICKET
         </a>
     </div>
@@ -41,7 +41,6 @@
                         <th>Escalation</th>
                         <th>Auto</th>
                         <th>Processed By</th>
-                        <th>Processed Date</th>
                         <th>Resolved Note</th>
                         <th>Created</th>
                         <th>Modified</th>
@@ -110,7 +109,6 @@
                                     }
                                 </td>
                                 <td>@item.ProcessedBy</td>
-                                <td>@item.ProcessedDate?.ToString("yyyy-MM-dd")</td>
                                 <td>
                                     <span title="@item.ResolvedNote">
                                         @(item.ResolvedNote?.Length > 20 ? item.ResolvedNote.Substring(0, 20) + "..." : item.ResolvedNote)
@@ -157,6 +155,23 @@
 
         $(document).ready(function() {
             initPagination();
+            
+            // Quick search functionality
+            $('#quickSearch').on('keyup', function() {
+                var searchTerm = $(this).val().toLowerCase();
+                
+                $('#ticketProcessingTable tbody tr').each(function() {
+                    var rowText = $(this).text().toLowerCase();
+                    if (rowText.indexOf(searchTerm) === -1) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
+                });
+                
+                // Reinitialize pagination after search
+                initPagination();
+            });
         });
 
         "use strict";
@@ -164,8 +179,10 @@
         var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
 
         connection.start().then(function () {
-            console.log("Connected to NotificationHub");
+            console.log("✅ Connected to NotificationHub");
+            console.log("Connection ID:", connection.connectionId);
         }).catch(function (err) {
+            console.error("❌ Connection failed:", err.toString());
             return console.error(err.toString());
         });
 
@@ -221,7 +238,6 @@
                     <td>${data.EscalationLevel ?? ''}</td>
                     <td>${autoBadge}</td>
                     <td>${data.ProcessedBy || ''}</td>
-                    <td>${formatDate(data.ProcessedDate)}</td>
                     <td><span title="${data.ResolvedNote || ''}">${truncate(data.ResolvedNote, 25)}</span></td>
                     <td>${formatDate(data.CreatedDate)}</td>
                     <td>${formatDate(data.ModifiedDate)}</td>
@@ -243,36 +259,87 @@
         }
 
         connection.on("ReceiverCreate", function (payload) {
-            const data = parsePayload(payload);
-            if (!data) return;
+            console.log("🔔 ReceiverCreate triggered!");
+            console.log("📦 Raw payload:", payload);
             
-            // Add new row at the top (pagination will handle visibility)
+            const data = parsePayload(payload);
+            console.log("✅ Parsed entity:", data);
+            
+            if (!data) {
+                console.error("❌ Failed to parse data");
+                return;
+            }
+            
+            // Add new row at the top
             const newRow = renderRow(data);
+            console.log("📝 Generated row HTML:", newRow);
+            
             $('#ticketProcessingTable tbody').prepend(newRow);
+            console.log("✅ Row inserted successfully");
+            
+            // Reinitialize pagination to update page count and show new row
+            initPagination();
+            console.log("♻️ Pagination refreshed");
             
             // Highlight the new row briefly
             $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
                 .css('background-color', '#d4edda')
                 .animate({ backgroundColor: 'transparent' }, 2000);
+            
+            console.log("✨ ReceiverCreate completed!");
         });
 
         connection.on("ReceiverUpdate", function (payload) {
+            console.log("🔔 ReceiverUpdate triggered!");
+            console.log("📦 Raw payload:", payload);
+            
             const data = parsePayload(payload);
-            if (!data) return;
+            console.log("✅ Parsed entity:", data);
+            
+            if (!data) {
+                console.error("❌ Failed to parse data");
+                return;
+            }
+            
             const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${data.TicketProcessingVietNid}']`);
+            console.log("🔍 Found row:", row.length > 0 ? "Yes" : "No");
+            
             const newRow = renderRow(data);
+            console.log("📝 Generated row HTML:", newRow);
+            
             if (row.length > 0) {
                 row.replaceWith(newRow);
+                console.log("✅ Row replaced successfully");
+                
+                // Reinitialize pagination to update display
+                initPagination();
+                console.log("♻️ Pagination refreshed");
                 
                 // Highlight updated row
                 $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
                     .css('background-color', '#fff3cd')
                     .animate({ backgroundColor: 'transparent' }, 2000);
+                
+                console.log("✨ ReceiverUpdate completed!");
+            } else {
+                console.warn("⚠️ Row not found, cannot update");
             }
         });
 
         connection.on("ReceiverDelete", function (ticketProcessingVietNid) {
-            $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`).remove();
+            console.log("🔔 ReceiverDelete triggered!");
+            console.log("🗑️ Deleting ID:", ticketProcessingVietNid);
+            
+            const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`);
+            console.log("🔍 Found row:", row.length > 0 ? "Yes" : "No");
+            
+            row.remove();
+            console.log("✅ Row deleted successfully");
+            
+            // Reinitialize pagination to update page count after deletion
+            initPagination();
+            console.log("♻️ Pagination refreshed");
+            console.log("✨ ReceiverDelete completed!");
         });
     </script>
 }

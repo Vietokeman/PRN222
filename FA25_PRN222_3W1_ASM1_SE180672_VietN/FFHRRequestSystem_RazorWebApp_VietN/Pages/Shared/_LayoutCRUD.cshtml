@@ -13,7 +13,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <a href="/" class="sidebar-logo">
+            <a asp-page="/Index" class="sidebar-logo">
                 <i class="bi bi-grid-3x3-gap-fill"></i>
                 <span>CRUD OPERATIONS</span>
             </a>
@@ -33,38 +33,21 @@
 
         <ul class="sidebar-menu">
             <li>
-                <a href="/" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
+                <a asp-page="/Index" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
                     <i class="bi bi-house-door"></i>
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="/TicketProcessingVietNs" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("TicketProcessingVietNs") == true ? "active" : "")">
+                <a asp-page="/TicketProcessingVietNs/Index" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("TicketProcessingVietNs") == true ? "active" : "")">
                     <i class="bi bi-ticket-perforated"></i>
                     <span>Tickets</span>
                 </a>
             </li>
-            <li>
-                <a href="#">
-                    <i class="bi bi-cash-coin"></i>
-                    <span>Payment</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="bi bi-file-earmark-text"></i>
-                    <span>Report</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="bi bi-gear"></i>
-                    <span>Settings</span>
-                </a>
-            </li>
+          
         </ul>
 
-        <a href="/Account/Logout" class="logout-btn">
+        <a asp-page="/Account/Logout" class="logout-btn">
             <i class="bi bi-box-arrow-right"></i>
             <span>Logout</span>
         </a>
