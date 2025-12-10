@@ -1,0 +1,168 @@
+﻿@model FFHRRequestSystem.Entitites.VietN.Models.TicketProcessingVietN
+
+@{
+    ViewData["Title"] = "Create New Ticket";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
+}
+
+<div class="content-header">
+    <h1><i class="bi bi-plus-circle"></i> Create New Ticket</h1>
+    <div class="header-actions">
+        <a asp-action="Index" class="btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="form-container">
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <!-- Basic Information Section -->
+        <div class="form-section">
+            <h3 class="form-section-title">Basic Information</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="ProcessingCode">Processing Code <span class="text-danger">*</span></label>
+                    <input asp-for="ProcessingCode" class="form-control" placeholder="Enter processing code" required />
+                    <span asp-validation-for="ProcessingCode" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="TicketReference">Ticket Reference <span class="text-danger">*</span></label>
+                    <input asp-for="TicketReference" class="form-control" placeholder="Enter ticket reference" required />
+                    <span asp-validation-for="TicketReference" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="ProcessingTypeVietNid">Processing Type <span class="text-danger">*</span></label>
+                    <select asp-for="ProcessingTypeVietNid" class="form-control" asp-items="ViewBag.ProcessingTypeVietNid" required>
+                        <option value="">-- Select Type --</option>
+                    </select>
+                    <span asp-validation-for="ProcessingTypeVietNid" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="RelatedTicketCode">Related Ticket Code</label>
+                    <input asp-for="RelatedTicketCode" class="form-control" placeholder="Enter related ticket code" />
+                    <span asp-validation-for="RelatedTicketCode" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Details Section -->
+        <div class="form-section">
+            <h3 class="form-section-title">Processing Details</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="ProcessingAction">Processing Action <span class="text-danger">*</span></label>
+                    <input asp-for="ProcessingAction" class="form-control" placeholder="Enter processing action" required />
+                    <span asp-validation-for="ProcessingAction" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ActionDescription">Action Description</label>
+                    <textarea asp-for="ActionDescription" class="form-control" placeholder="Enter description"></textarea>
+                    <span asp-validation-for="ActionDescription" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="PriorityLevel">Priority Level <span class="text-danger">*</span></label>
+                    <select asp-for="PriorityLevel" class="form-control" required>
+                        <option value="">-- Select Priority --</option>
+                        <option value="1">Low</option>
+                        <option value="2">Medium</option>
+                        <option value="3">High</option>
+                    </select>
+                    <span asp-validation-for="PriorityLevel" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Status">Status <span class="text-danger">*</span></label>
+                    <select asp-for="Status" class="form-control" required>
+                        <option value="">-- Select Status --</option>
+                        <option value="1" selected>Active</option>
+                        <option value="2">Resolved</option>
+                        <option value="3">Closed</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="OverdueDays">Overdue Days</label>
+                    <input asp-for="OverdueDays" type="number" class="form-control" placeholder="0" value="0" />
+                    <span asp-validation-for="OverdueDays" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="EscalationLevel">Escalation Level</label>
+                    <input asp-for="EscalationLevel" type="number" class="form-control" placeholder="0" value="0" />
+                    <span asp-validation-for="EscalationLevel" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="IsAutoProcessed" type="checkbox" />
+                        <label class="form-check-label" asp-for="IsAutoProcessed">
+                            Is Auto Processed
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resolution Details Section -->
+        <div class="form-section">
+            <h3 class="form-section-title">Resolution Details</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="ProcessedBy">Processed By</label>
+                    <input asp-for="ProcessedBy" type="number" class="form-control" placeholder="Enter processor ID" />
+                    <span asp-validation-for="ProcessedBy" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ProcessedDate">Processed Date</label>
+                    <input asp-for="ProcessedDate" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="ProcessedDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label asp-for="ResolvedNote">Resolved Note</label>
+                    <textarea asp-for="ResolvedNote" class="form-control" placeholder="Enter resolution notes"></textarea>
+                    <span asp-validation-for="ResolvedNote" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Fields Section -->
+        <div class="form-section">
+            <h3 class="form-section-title">System Information</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="CreatedDate">Created Date</label>
+                    <input asp-for="CreatedDate" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ModifiedDate">Modified Date</label>
+                    <input asp-for="ModifiedDate" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="ModifiedDate" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a asp-action="Index" class="btn-secondary">
+                <i class="bi bi-x-circle"></i> Cancel
+            </a>
+            <button type="submit" class="btn-primary">
+                <i class="bi bi-check-circle"></i> Create Ticket
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CRUD Operations</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/crud-style.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                <span>CRUD OPERATIONS</span>
+            </a>
+        </div>
+
+        <div class="user-profile">
+            <div class="user-avatar">
+                @{
+                    var userName = User?.Identity?.Name ?? "Admin";
+                    var firstLetter = userName.Substring(0, 1).ToUpper();
+                }
+                @firstLetter
+            </div>
+            <div class="user-name">@userName</div>
+            <div class="user-role">Admin</div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
+                    <i class="bi bi-house-door"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="/TicketProcessingVietNs" class="@(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("TicketProcessingVietNs") == true ? "active" : "")">
+                    <i class="bi bi-ticket-perforated"></i>
+                    <span>Tickets</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bi bi-cash-coin"></i>
+                    <span>Payment</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Report</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bi bi-gear"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+
+        <a href="/Account/Logout" class="logout-btn">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

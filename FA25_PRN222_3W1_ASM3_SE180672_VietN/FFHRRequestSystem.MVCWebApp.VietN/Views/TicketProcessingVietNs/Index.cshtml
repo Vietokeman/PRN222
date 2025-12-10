@@ -1,0 +1,140 @@
+﻿@model IEnumerable<FFHRRequestSystem.Entitites.VietN.Models.TicketProcessingVietN>
+
+@{
+    ViewData["Title"] = "Tickets Management";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
+}
+
+<div class="content-header">
+    <h1><i class="bi bi-ticket-perforated"></i> Tickets Management</h1>
+    <div class="header-actions">
+        <div class="search-box">
+            <input type="text" placeholder="Search..." />
+            <i class="bi bi-search"></i>
+        </div>
+        <button class="notification-btn">
+            <i class="bi bi-bell"></i>
+            <span class="notification-badge">3</span>
+        </button>
+        <a asp-action="Create" class="btn-add-new">
+            <i class="bi bi-plus-circle"></i> ADD NEW TICKET
+        </a>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="data-table-container">
+    <div class="table-header">
+        <h2>Ticket Processing Records</h2>
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Ticket Ref</th>
+                    <th>Action</th>
+                    <th>Description</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Overdue</th>
+                    <th>Escalation</th>
+                    <th>Auto</th>
+                    <th>Processed By</th>
+                    <th>Processed Date</th>
+                    <th>Resolved Note</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Type</th>
+                    <th style="text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.ProcessingCode</td>
+                        <td>@item.TicketReference</td>
+                        <td>@item.ProcessingAction</td>
+                        <td>
+                            <span title="@item.ActionDescription">
+                                @(item.ActionDescription?.Length > 25 ? item.ActionDescription.Substring(0, 25) + "..." : item.ActionDescription)
+                            </span>
+                        </td>
+                        <td>
+                            @{
+                                string priorityText = item.PriorityLevel switch
+                                {
+                                    3 => "High",
+                                    2 => "Medium",
+                                    _ => "Low"
+                                };
+                                string priorityClass = item.PriorityLevel switch
+                                {
+                                    3 => "badge-danger",
+                                    2 => "badge-warning",
+                                    _ => "badge-secondary"
+                                };
+                            }
+                            <span class="badge @priorityClass">@priorityText</span>
+                        </td>
+                        <td>
+                            @{
+                                string statusText = item.Status switch
+                                {
+                                    1 => "Active",
+                                    2 => "Resolved",
+                                    3 => "Closed",
+                                    _ => "Unknown"
+                                };
+                                string statusClass = item.Status switch
+                                {
+                                    1 => "badge-success",
+                                    2 => "badge-info",
+                                    3 => "badge-secondary",
+                                    _ => "badge-secondary"
+                                };
+                            }
+                            <span class="badge @statusClass">@statusText</span>
+                        </td>
+                        <td>@item.OverdueDays</td>
+                        <td>@item.EscalationLevel</td>
+                        <td>
+                            @if (item.IsAutoProcessed)
+                            {
+                                <span class="badge badge-info">Auto</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-secondary">Manual</span>
+                            }
+                        </td>
+                        <td>@item.ProcessedBy</td>
+                        <td>@item.ProcessedDate?.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <span title="@item.ResolvedNote">
+                                @(item.ResolvedNote?.Length > 20 ? item.ResolvedNote.Substring(0, 20) + "..." : item.ResolvedNote)
+                            </span>
+                        </td>
+                        <td>@item.CreatedDate?.ToString("yyyy-MM-dd")</td>
+                        <td>@item.ModifiedDate?.ToString("yyyy-MM-dd")</td>
+                        <td>@item.ProcessingTypeVietN?.TypeName</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a asp-action="Details" asp-route-id="@item.TicketProcessingVietNid" class="btn-action btn-view" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.TicketProcessingVietNid" class="btn-action btn-edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.TicketProcessingVietNid" class="btn-action btn-delete" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
