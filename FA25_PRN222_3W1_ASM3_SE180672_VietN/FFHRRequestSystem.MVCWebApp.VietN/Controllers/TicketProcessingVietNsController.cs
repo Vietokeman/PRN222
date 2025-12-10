@@ -9,9 +9,11 @@ using FFHRRequestSystem.Entitites.VietN.Models;
 using FFHRRequestSystem.Repositories.VietN.DBContext;
 using FFHRRequestSystem.Services.VietN;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
 {
+    [Authorize]
     public class TicketProcessingVietNsController : Controller
     {
         //private readonly FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext _context;
@@ -26,9 +28,23 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
         }
 
         // GET: TicketProcessingVietNs
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string processingAction, string actionDescription, string typeName)
         {
-            var items = await _service.GetAllAsync();
+            List<TicketProcessingVietN> items;
+            
+            if (!string.IsNullOrEmpty(processingAction) || !string.IsNullOrEmpty(actionDescription) || !string.IsNullOrEmpty(typeName))
+            {
+                items = await _service.SearchAsync(processingAction, actionDescription, typeName);
+            }
+            else
+            {
+                items = await _service.GetAllAsync();
+            }
+
+            ViewData["ProcessingAction"] = processingAction;
+            ViewData["ActionDescription"] = actionDescription;
+            ViewData["TypeName"] = typeName;
+
             return View(items);
         }
 
@@ -53,29 +69,25 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
         public async Task<IActionResult> Create()
         {
             var listTypes = await _processingTypeService.GetAllAsync();
-            ViewData["ProcessingTypeVietNid"] = new SelectList(listTypes, "ProcessingTypeVietNid", "TypeCode");
+            ViewData["ProcessingTypeVietNid"] = new SelectList(listTypes, "ProcessingTypeVietNid", "TypeName");
 
-            //set default values
-            var item = new TicketProcessingVietN()
-            {
-                TicketProcessingVietNid = Guid.NewGuid(),
-                CreatedDate = DateTime.Now,
-                ProcessedBy = "VietN",
-
-            };
             return View();
         }
 
         // POST: TicketProcessingVietNs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( TicketProcessingVietN ticketProcessingVietN)
+        public async Task<IActionResult> Create(TicketProcessingVietN ticketProcessingVietN)
         {
             if (ModelState.IsValid)
             {
-               var result =  await _service.CreateAsync(ticketProcessingVietN);
+                // Ensure new Guid and set default values
+                ticketProcessingVietN.TicketProcessingVietNid = Guid.NewGuid();
+                ticketProcessingVietN.ProcessedBy = "VietN";
+                ticketProcessingVietN.CreatedDate = DateTime.Now;
+                ticketProcessingVietN.ModifiedDate = DateTime.Now;
+
+                var result = await _service.CreateAsync(ticketProcessingVietN);
                 if (result > 0)
                 {
                     return RedirectToAction(nameof(Index));
@@ -83,7 +95,7 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
             }
 
             var listTypes = await _processingTypeService.GetAllAsync();
-            ViewData["ProcessingTypeVietNid"] = new SelectList(listTypes, "ProcessingTypeVietNid", "TypeCode");
+            ViewData["ProcessingTypeVietNid"] = new SelectList(listTypes, "ProcessingTypeVietNid", "TypeName", ticketProcessingVietN.ProcessingTypeVietNid);
             return View(ticketProcessingVietN);
         }
 
@@ -140,24 +152,22 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
         //    return View(ticketProcessingVietN);
         //}
 
-        //// GET: TicketProcessingVietNs/Delete/5
-        //public async Task<IActionResult> Delete(Guid? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // GET: TicketProcessingVietNs/Delete/5
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var ticketProcessingVietN = await _context.TicketProcessingVietNs
-        //        .Include(t => t.ProcessingTypeVietN)
-        //        .FirstOrDefaultAsync(m => m.TicketProcessingVietNid == id);
-        //    if (ticketProcessingVietN == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var ticketProcessingVietN = await _service.GetByIdAsync(id);
+            if (ticketProcessingVietN == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(ticketProcessingVietN);
-        //}
+            return View(ticketProcessingVietN);
+        }
 
         // POST: TicketProcessingVietNs/Delete/5
         [HttpPost, ActionName("Delete")]

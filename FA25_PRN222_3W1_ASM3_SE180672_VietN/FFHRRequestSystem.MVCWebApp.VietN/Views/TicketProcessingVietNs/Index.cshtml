@@ -22,13 +22,46 @@
     </div>
 </div>
 
+<!-- Search Filters -->
+<div class="data-table-container" style="margin-bottom: 20px;">
+    <div class="table-header">
+        <h2>Search Filters</h2>
+    </div>
+    <div style="padding: 20px;">
+        <form method="get" asp-action="Index">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Processing Action</label>
+                    <input type="text" name="processingAction" class="form-control" value="@ViewData["ProcessingAction"]" placeholder="Enter processing action" />
+                </div>
+                <div class="form-group">
+                    <label>Action Description</label>
+                    <input type="text" name="actionDescription" class="form-control" value="@ViewData["ActionDescription"]" placeholder="Enter action description" />
+                </div>
+                <div class="form-group">
+                    <label>Type Name</label>
+                    <input type="text" name="typeName" class="form-control" value="@ViewData["TypeName"]" placeholder="Enter type name" />
+                </div>
+            </div>
+            <div class="form-actions" style="margin-top: 0; padding-top: 0; border: none;">
+                <a asp-action="Index" class="btn-secondary">
+                    <i class="bi bi-x-circle"></i> Clear
+                </a>
+                <button type="submit" class="btn-primary">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Data Table -->
 <div class="data-table-container">
     <div class="table-header">
         <h2>Ticket Processing Records</h2>
     </div>
     <div style="overflow-x: auto;">
-        <table class="data-table">
+        <table id="ticketProcessingTable" class="data-table">
             <thead>
                 <tr>
                     <th>Code</th>
@@ -52,7 +85,7 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr>
+                    <tr data-id="@item.TicketProcessingVietNid">
                         <td>@item.ProcessingCode</td>
                         <td>@item.TicketReference</td>
                         <td>@item.ProcessingAction</td>
@@ -138,3 +171,141 @@
         </table>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/table-pagination.js"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script>
+        var paginationSettings = {
+            rowPerPage: 10,  
+            paginationColor: '#007bff',  
+            fontColor: '#333',  
+            transitionDuration: 300  
+        };
+
+        function initPagination() {
+            $('#ticketProcessingTable').createTablePagination(paginationSettings);
+        }
+
+        $(document).ready(function() {
+            initPagination();
+        });
+
+        "use strict";
+
+        var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
+
+        connection.start().then(function () {
+            console.log("Connected to NotificationHub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        function parsePayload(payload) {
+            return typeof payload === 'string' ? JSON.parse(payload) : payload;
+        }
+
+        function buildBadge(value, map) {
+            const def = map.default || { text: '', cls: '' };
+            return map[value] || def;
+        }
+
+        function formatDate(dateValue) {
+            if (!dateValue) return '';
+            const date = new Date(dateValue);
+            if (Number.isNaN(date.getTime())) return '';
+            return date.toISOString().split('T')[0];
+        }
+
+        function truncate(text, length) {
+            if (!text) return '';
+            return text.length > length ? text.substring(0, length) + '...' : text;
+        }
+
+        function renderRow(data) {
+            const priority = buildBadge(data.PriorityLevel, {
+                3: { text: 'High', cls: 'badge-danger' },
+                2: { text: 'Medium', cls: 'badge-warning' },
+                1: { text: 'Low', cls: 'badge-secondary' },
+                default: { text: 'Unknown', cls: 'badge-secondary' }
+            });
+
+            const status = buildBadge(data.Status, {
+                1: { text: 'Active', cls: 'badge-success' },
+                2: { text: 'Resolved', cls: 'badge-info' },
+                3: { text: 'Closed', cls: 'badge-secondary' },
+                default: { text: 'Unknown', cls: 'badge-secondary' }
+            });
+
+            const autoBadge = data.IsAutoProcessed
+                ? '<span class="badge badge-info">Auto</span>'
+                : '<span class="badge badge-secondary">Manual</span>';
+
+            return `
+                <tr data-id="${data.TicketProcessingVietNid}">
+                    <td>${data.ProcessingCode || ''}</td>
+                    <td>${data.TicketReference || ''}</td>
+                    <td>${data.ProcessingAction || ''}</td>
+                    <td><span title="${data.ActionDescription || ''}">${truncate(data.ActionDescription, 25)}</span></td>
+                    <td><span class="badge ${priority.cls}">${priority.text}</span></td>
+                    <td><span class="badge ${status.cls}">${status.text}</span></td>
+                    <td>${data.OverdueDays ?? ''}</td>
+                    <td>${data.EscalationLevel ?? ''}</td>
+                    <td>${autoBadge}</td>
+                    <td>${data.ProcessedBy || ''}</td>
+                    <td>${formatDate(data.ProcessedDate)}</td>
+                    <td><span title="${data.ResolvedNote || ''}">${truncate(data.ResolvedNote, 25)}</span></td>
+                    <td>${formatDate(data.CreatedDate)}</td>
+                    <td>${formatDate(data.ModifiedDate)}</td>
+                    <td>${data.ProcessingTypeVietN?.TypeName || data.TypeName || ''}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="/TicketProcessingVietNs/Details?id=${data.TicketProcessingVietNid}" class="btn-action btn-view" title="View">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="/TicketProcessingVietNs/Edit?id=${data.TicketProcessingVietNid}" class="btn-action btn-edit" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="/TicketProcessingVietNs/Delete?id=${data.TicketProcessingVietNid}" class="btn-action btn-delete" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>`;
+        }
+
+        connection.on("ReceiverCreate", function (payload) {
+            const data = parsePayload(payload);
+            if (!data) return;
+            
+            // Add new row at the top (pagination will handle visibility)
+            const newRow = renderRow(data);
+            $('#ticketProcessingTable tbody').prepend(newRow);
+            
+            // Highlight the new row briefly
+            $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
+                .css('background-color', '#d4edda')
+                .animate({ backgroundColor: 'transparent' }, 2000);
+        });
+
+        connection.on("ReceiverUpdate", function (payload) {
+            const data = parsePayload(payload);
+            if (!data) return;
+            const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${data.TicketProcessingVietNid}']`);
+            const newRow = renderRow(data);
+            if (row.length > 0) {
+                row.replaceWith(newRow);
+                
+                // Highlight updated row
+                $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
+                    .css('background-color', '#fff3cd')
+                    .animate({ backgroundColor: 'transparent' }, 2000);
+            }
+        });
+
+        connection.on("ReceiverDelete", function (ticketProcessingVietNid) {
+            $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`).remove();
+        });
+    </script>
+}
