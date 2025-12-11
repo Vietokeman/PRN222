@@ -183,6 +183,16 @@
         };
 
         function initPagination() {
+            // Remove existing pagination first
+            var tableId = 'ticketProcessingTable';
+            $('.pagintaion-container-' + tableId).remove();
+            $('.page-list-table-' + tableId).remove();
+            $('#pagintaion-' + tableId).remove();
+            
+            // Show all rows before reinitializing
+            $('#ticketProcessingTable tbody tr').show();
+            
+            // Reinitialize pagination
             $('#ticketProcessingTable').createTablePagination(paginationSettings);
         }
 
@@ -253,10 +263,10 @@
         var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
 
         connection.start().then(function () {
-            console.log("✅ Connected to NotificationHub");
-            console.log("Connection ID:", connection.connectionId);
+            console.log("[SignalR] Connected to NotificationHub");
+            console.log("[SignalR] Connection ID:", connection.connectionId);
         }).catch(function (err) {
-            console.error("❌ Connection failed:", err.toString());
+            console.error("[SignalR] Connection failed:", err.toString());
             return console.error(err.toString());
         });
 
@@ -333,97 +343,97 @@
         }
 
         connection.on("ReceiverCreate", function (payload) {
-            console.log("🔔 ReceiverCreate triggered!");
-            console.log("📦 Raw payload:", payload);
+            console.log("[SignalR] ReceiverCreate triggered!");
+            console.log("[SignalR] Raw payload:", payload);
             
             const data = parsePayload(payload);
-            console.log("✅ Parsed entity:", data);
+            console.log("[SignalR] Parsed entity:", data);
             
             if (!data) {
-                console.error("❌ Failed to parse data");
+                console.error("[SignalR] Failed to parse data");
                 showToast("Failed to create ticket - Invalid data", "error");
                 return;
             }
             
             // Add new row at the top
             const newRow = renderRow(data);
-            console.log("📝 Generated row HTML:", newRow);
+            console.log("[SignalR] Generated row HTML:", newRow);
             
             $('#ticketProcessingTable tbody').prepend(newRow);
-            console.log("✅ Row inserted successfully");
+            console.log("[SignalR] Row inserted successfully");
             
             // Reinitialize pagination to update page count and show new row
             initPagination();
-            console.log("♻️ Pagination refreshed");
+            console.log("[SignalR] Pagination refreshed");
             
             // Highlight the new row briefly
             $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
                 .css('background-color', '#d4edda')
                 .animate({ backgroundColor: 'transparent' }, 2000);
             
-            showToast(`✅ Ticket "${data.ProcessingCode}" created successfully via SignalR!`, "success");
-            console.log("✨ ReceiverCreate completed!");
+            showToast(`Ticket "${data.ProcessingCode}" created successfully via SignalR!`, "success");
+            console.log("[SignalR] ReceiverCreate completed!");
         });
 
         connection.on("ReceiverUpdate", function (payload) {
-            console.log("🔔 ReceiverUpdate triggered!");
-            console.log("📦 Raw payload:", payload);
+            console.log("[SignalR] ReceiverUpdate triggered!");
+            console.log("[SignalR] Raw payload:", payload);
             
             const data = parsePayload(payload);
-            console.log("✅ Parsed entity:", data);
+            console.log("[SignalR] Parsed entity:", data);
             
             if (!data) {
-                console.error("❌ Failed to parse data");
+                console.error("[SignalR] Failed to parse data");
                 showToast("Failed to update ticket - Invalid data", "error");
                 return;
             }
             
             const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${data.TicketProcessingVietNid}']`);
-            console.log("🔍 Found row:", row.length > 0 ? "Yes" : "No");
+            console.log("[SignalR] Found row:", row.length > 0 ? "Yes" : "No");
             
             const newRow = renderRow(data);
-            console.log("📝 Generated row HTML:", newRow);
+            console.log("[SignalR] Generated row HTML:", newRow);
             
             if (row.length > 0) {
                 row.replaceWith(newRow);
-                console.log("✅ Row replaced successfully");
+                console.log("[SignalR] Row replaced successfully");
                 
                 // Reinitialize pagination to update display
                 initPagination();
-                console.log("♻️ Pagination refreshed");
+                console.log("[SignalR] Pagination refreshed");
                 
                 // Highlight updated row
                 $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
                     .css('background-color', '#fff3cd')
                     .animate({ backgroundColor: 'transparent' }, 2000);
                 
-                showToast(`✅ Ticket "${data.ProcessingCode}" updated successfully via SignalR!`, "info");
-                console.log("✨ ReceiverUpdate completed!");
+                showToast(`Ticket "${data.ProcessingCode}" updated successfully via SignalR!`, "info");
+                console.log("[SignalR] ReceiverUpdate completed!");
             } else {
-                console.warn("⚠️ Row not found, cannot update");
+                console.warn("[SignalR] Row not found, cannot update");
                 showToast("Ticket not found in table", "warning");
             }
         });
 
         connection.on("ReceiverDelete", function (ticketProcessingVietNid) {
-            console.log("🔔 ReceiverDelete triggered!");
-            console.log("🗑️ Deleting ID:", ticketProcessingVietNid);
+            console.log("[SignalR] ReceiverDelete triggered!");
+            console.log("[SignalR] Deleting ID:", ticketProcessingVietNid);
             
             const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`);
-            console.log("🔍 Found row:", row.length > 0 ? "Yes" : "No");
+            console.log("[SignalR] Found row:", row.length > 0 ? "Yes" : "No");
             
             if (row.length > 0) {
                 row.remove();
-                console.log("✅ Row deleted successfully");
+                console.log("[SignalR] Row deleted successfully");
                 
                 // Reinitialize pagination to update page count after deletion
                 initPagination();
-                console.log("♻️ Pagination refreshed");
+                console.log("[SignalR] Pagination refreshed");
                 
-                showToast("🗑️ Ticket deleted successfully via SignalR!", "warning");
-                console.log("✨ ReceiverDelete completed!");
+                showToast("Ticket deleted successfully via SignalR!", "warning");
+                console.log("[SignalR] ReceiverDelete completed!");
             } else {
-                console.warn("⚠️ Row not found, cannot delete");
+                console.warn("[SignalR] Row not found, cannot delete");
                 showToast("Ticket not found in table", "error");
             }
         });

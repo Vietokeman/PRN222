@@ -190,10 +190,10 @@
 
         connection.start().then(function () {
             console.log("Connected to NotificationHub (create)");
-            showToast("✅ Connected to real-time updates", "info");
+            showToast("Connected to real-time updates", "info");
         }).catch(function (err) {
             console.error(err.toString());
-            showToast("❌ Failed to connect to real-time updates", "error");
+            showToast("Failed to connect to real-time updates", "error");
             return console.error(err.toString());
         });
 
@@ -221,12 +221,12 @@
                 TypeName: document.querySelector("#TicketProcessingVietN_ProcessingTypeVietNid option:checked")?.text || ""
             });
 
-            showToast("📤 Sending ticket creation request...", "info");
+            showToast("Sending ticket creation request...", "info");
             
             connection.invoke("HubCreate", dataObj)
                 .then(function() {
-                    console.log("✅ HubCreate invoked successfully");
-                    showToast("✅ Ticket creation request sent! Check Index page for updates.", "success");
+                    console.log("[SignalR] HubCreate invoked successfully");
+                    showToast("Ticket creation request sent! Check Index page for updates.", "success");
                     
                     // Optionally redirect after 2 seconds
                     setTimeout(function() {
@@ -235,7 +235,7 @@
                 })
                 .catch(function (err) {
                     console.error(err.toString());
-                    showToast("❌ Failed to create ticket: " + err.toString(), "error");
+                    showToast("Failed to create ticket: " + err.toString(), "error");
                     return console.error(err.toString());
                 });
         });

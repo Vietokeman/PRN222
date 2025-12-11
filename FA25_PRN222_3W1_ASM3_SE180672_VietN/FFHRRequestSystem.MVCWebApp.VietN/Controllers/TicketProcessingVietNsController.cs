@@ -90,17 +90,17 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
                 var result = await _service.CreateAsync(ticketProcessingVietN);
                 if (result > 0)
                 {
-                    TempData["SuccessMessage"] = $"✅ Ticket '{ticketProcessingVietN.ProcessingCode}' created successfully!";
+                    TempData["SuccessMessage"] = $"Ticket '{ticketProcessingVietN.ProcessingCode}' created successfully!";
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "❌ Failed to create ticket. Please try again.";
+                    TempData["ErrorMessage"] = "Failed to create ticket. Please try again.";
                 }
             }
             else
             {
-                TempData["ErrorMessage"] = "❌ Invalid form data. Please check your input.";
+                TempData["ErrorMessage"] = "Invalid form data. Please check your input.";
             }
 
             var listTypes = await _processingTypeService.GetAllAsync();
@@ -189,11 +189,11 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
             var result = await _service.DeleteAsync(id);
             if (result)
             {
-                TempData["SuccessMessage"] = $"🗑️ Ticket '{ticketCode}' deleted successfully!";
+                TempData["SuccessMessage"] = $"Ticket '{ticketCode}' deleted successfully!";
             }
             else
             {
-                TempData["ErrorMessage"] = $"❌ Failed to delete ticket '{ticketCode}'.";
+                TempData["ErrorMessage"] = $"Failed to delete ticket '{ticketCode}'.";
             }
             
             return RedirectToAction(nameof(Index));

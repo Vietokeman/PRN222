@@ -50,7 +50,7 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
             var deleteId = id ?? TicketProcessingVietN?.TicketProcessingVietNid;
             if (deleteId == null)
             {
-                TempData["ErrorMessage"] = "❌ Invalid ticket ID.";
+                TempData["ErrorMessage"] = "Invalid ticket ID.";
                 return NotFound();
             }
 
@@ -58,11 +58,11 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
             var result = await _service.DeleteAsync(deleteId.Value);
             if (!result)
             {
-                TempData["ErrorMessage"] = $"❌ Failed to delete ticket '{ticketCode}'.";
+                TempData["ErrorMessage"] = $"Failed to delete ticket '{ticketCode}'.";
                 return Page();
             }
 
-            TempData["SuccessMessage"] = $"🗑️ Ticket '{ticketCode}' deleted successfully!";
+            TempData["SuccessMessage"] = $"Ticket '{ticketCode}' deleted successfully!";
             return RedirectToPage("./Index");
         }
     }

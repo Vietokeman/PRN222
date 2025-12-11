@@ -1,0 +1,76 @@
+﻿@page "/ticketprocessingvietns/details"
+@using FFHRRequestSystem.Services.VietN
+@using Microsoft.EntityFrameworkCore
+@using FFHRRequestSystem.Entitites.VietN.Models
+@* @inject IDbContextFactory<FFHRRequestSystem.Repositories.VietN.DBContext.FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext> DbFactory *@
+@inject NavigationManager NavigationManager
+@inject TicketProcessingVietNService _ticketProcessingService
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>TicketProcessingVietN</h2>
+    <hr />
+    @if (ticketprocessingvietn is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ProcessingCode</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.ProcessingCode</dd>
+            <dt class="col-sm-2">TicketReference</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.TicketReference</dd>
+            <dt class="col-sm-2">ProcessingType</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.ProcessingTypeVietN?.TypeName</dd>
+            <dt class="col-sm-2">ProcessingAction</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.ProcessingAction</dd>
+            <dt class="col-sm-2">ActionDescription</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.ActionDescription</dd>
+            <dt class="col-sm-2">RelatedTicketCode</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.RelatedTicketCode</dd>
+            <dt class="col-sm-2">PriorityLevel</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.PriorityLevel</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.Status</dd>
+            <dt class="col-sm-2">OverdueDays</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.OverdueDays</dd>
+            <dt class="col-sm-2">EscalationLevel</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.EscalationLevel</dd>
+            <dt class="col-sm-2">IsAutoProcessed</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.IsAutoProcessed</dd>
+            <dt class="col-sm-2">ProcessedBy</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.ProcessedBy</dd>
+            <dt class="col-sm-2">ProcessedDate</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.ProcessedDate</dd>
+            <dt class="col-sm-2">ResolvedNote</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.ResolvedNote</dd>
+            <dt class="col-sm-2">CreatedDate</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.CreatedDate</dd>
+            <dt class="col-sm-2">ModifiedDate</dt>
+            <dd class="col-sm-10">@ticketprocessingvietn.ModifiedDate</dd>
+        </dl>
+        <div>
+            <a href="@($"/ticketprocessingvietns/edit?ticketprocessingvietnid={ticketprocessingvietn.TicketProcessingVietNid}")">Edit</a> |
+            <a href="@($"/ticketprocessingvietns")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private TicketProcessingVietN? ticketprocessingvietn;
+
+    [SupplyParameterFromQuery]
+    private Guid TicketProcessingVietNid { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ticketprocessingvietn = await _ticketProcessingService.GetByIdAsync(TicketProcessingVietNid);
+        if (ticketprocessingvietn is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

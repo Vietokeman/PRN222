@@ -1,0 +1,177 @@
+﻿@page "/ticketprocessingvietns/edit"
+@using Microsoft.EntityFrameworkCore
+@using FFHRRequestSystem.Entitites.VietN.Models
+@using FFHRRequestSystem.Services.VietN
+@inject IDbContextFactory<FFHRRequestSystem.Repositories.VietN.DBContext.FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>TicketProcessingVietN</h2>
+<hr />
+@if (TicketProcessingVietN is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="TicketProcessingVietN" OnValidSubmit="UpdateTicketProcessingVietN" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="TicketProcessingVietN.TicketProcessingVietNid" value="@TicketProcessingVietN.TicketProcessingVietNid" />
+                <div class="mb-3">
+                    <label for="processingcode" class="form-label">ProcessingCode:</label>
+                    <InputText id="processingcode" @bind-Value="TicketProcessingVietN.ProcessingCode" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.ProcessingCode" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="ticketreference" class="form-label">TicketReference:</label>
+                    <InputText id="ticketreference" @bind-Value="TicketProcessingVietN.TicketReference" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.TicketReference" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="processingtypevietnid" class="form-label">ProcessingType:</label>
+                    <InputSelect id="processingtypevietnid" @bind-Value="TicketProcessingVietN.ProcessingTypeVietNid" class="form-control">
+                        <option value="">-- Select Type --</option>
+                        @foreach (var type in ProcessingTypeVietNs)
+                        {
+                            <option value="@type.ProcessingTypeVietNid">@type.TypeName</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => TicketProcessingVietN.ProcessingTypeVietNid" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="processingaction" class="form-label">ProcessingAction:</label>
+                    <InputText id="processingaction" @bind-Value="TicketProcessingVietN.ProcessingAction" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.ProcessingAction" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="actiondescription" class="form-label">ActionDescription:</label>
+                    <InputText id="actiondescription" @bind-Value="TicketProcessingVietN.ActionDescription" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.ActionDescription" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="relatedticketcode" class="form-label">RelatedTicketCode:</label>
+                    <InputText id="relatedticketcode" @bind-Value="TicketProcessingVietN.RelatedTicketCode" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.RelatedTicketCode" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="prioritylevel" class="form-label">PriorityLevel:</label>
+                    <InputNumber id="prioritylevel" @bind-Value="TicketProcessingVietN.PriorityLevel" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.PriorityLevel" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status:</label>
+                    <InputNumber id="status" @bind-Value="TicketProcessingVietN.Status" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.Status" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="overduedays" class="form-label">OverdueDays:</label>
+                    <InputNumber id="overduedays" @bind-Value="TicketProcessingVietN.OverdueDays" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.OverdueDays" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="escalationlevel" class="form-label">EscalationLevel:</label>
+                    <InputNumber id="escalationlevel" @bind-Value="TicketProcessingVietN.EscalationLevel" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.EscalationLevel" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="isautoprocessed" class="form-label">IsAutoProcessed:</label>
+                    <InputCheckbox id="isautoprocessed" @bind-Value="TicketProcessingVietN.IsAutoProcessed" class="form-check-input" />
+                    <ValidationMessage For="() => TicketProcessingVietN.IsAutoProcessed" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="processedby" class="form-label">ProcessedBy:</label>
+                    <InputText id="processedby" @bind-Value="TicketProcessingVietN.ProcessedBy" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.ProcessedBy" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="processeddate" class="form-label">ProcessedDate:</label>
+                    <InputDate id="processeddate" @bind-Value="TicketProcessingVietN.ProcessedDate" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.ProcessedDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="resolvednote" class="form-label">ResolvedNote:</label>
+                    <InputText id="resolvednote" @bind-Value="TicketProcessingVietN.ResolvedNote" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.ResolvedNote" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createddate" class="form-label">CreatedDate:</label>
+                    <InputDate id="createddate" @bind-Value="TicketProcessingVietN.CreatedDate" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.CreatedDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="modifieddate" class="form-label">ModifiedDate:</label>
+                    <InputDate id="modifieddate" @bind-Value="TicketProcessingVietN.ModifiedDate" class="form-control" />
+                    <ValidationMessage For="() => TicketProcessingVietN.ModifiedDate" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/ticketprocessingvietns">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private Guid TicketProcessingVietNid { get; set; }
+
+    [SupplyParameterFromForm]
+    private TicketProcessingVietN? TicketProcessingVietN { get; set; }
+
+    private IQueryable<ProcessingTypeVietN> ProcessingTypeVietNs = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        TicketProcessingVietN ??= await context.TicketProcessingVietNs.FirstOrDefaultAsync(m => m.TicketProcessingVietNid == TicketProcessingVietNid);
+
+        if (TicketProcessingVietN is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+
+        var typeService = new ProcessingTypeVietNService();
+        ProcessingTypeVietNs = (await typeService.GetAllAsync()).AsQueryable();
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateTicketProcessingVietN()
+    {
+        using var context = DbFactory.CreateDbContext();
+        TicketProcessingVietN!.ModifiedDate = DateTime.Now;
+        context.Attach(TicketProcessingVietN!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!TicketProcessingVietNExists(TicketProcessingVietN!.TicketProcessingVietNid))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/ticketprocessingvietns");
+    }
+
+    private bool TicketProcessingVietNExists(Guid ticketprocessingvietnid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.TicketProcessingVietNs.Any(e => e.TicketProcessingVietNid == ticketprocessingvietnid);
+    }
+}

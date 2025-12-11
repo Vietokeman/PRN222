@@ -1,0 +1,53 @@
+﻿@page "/ticketprocessingvietns"
+@using FFHRRequestSystem.Services.VietN
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using FFHRRequestSystem.Entitites.VietN.Models
+@using FFHRRequestSystem.Repositories.VietN.DBContext
+@* @implements IAsyncDisposable *@
+@* @inject IDbContextFactory<FFHRRequestSystem.Repositories.VietN.DBContext.FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext> DbFactory *@
+@inject FFHRRequestSystem.Services.VietN.TicketProcessingVietNService _ticketService
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="ticketprocessingvietns/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="ticketProcessingVietNs">
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ProcessingCode" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.TicketReference" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ProcessingTypeVietNid" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ProcessingAction" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ActionDescription" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.RelatedTicketCode" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.PriorityLevel" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.Status" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.OverdueDays" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.EscalationLevel" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.IsAutoProcessed" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ProcessedBy" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ProcessedDate" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ResolvedNote" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.CreatedDate" />
+    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ModifiedDate" />
+
+    <TemplateColumn Context="ticketprocessingvietn">
+        <a href="@($"ticketprocessingvietns/edit?ticketprocessingvietnid={ticketprocessingvietn.TicketProcessingVietNid}")">Edit</a> |
+        <a href="@($"ticketprocessingvietns/details?ticketprocessingvietnid={ticketprocessingvietn.TicketProcessingVietNid}")">Details</a> |
+        <a href="@($"ticketprocessingvietns/delete?ticketprocessingvietnid={ticketprocessingvietn.TicketProcessingVietNid}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    // private FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext context = default!;
+    private IQueryable<TicketProcessingVietN> ticketProcessingVietNs = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ticketProcessingVietNs = (await _ticketService.GetAllAsync()).AsQueryable();
+    }
+
+    // public async ValueTask DisposeAsync() => await ticketProcessingVietNs.DisposeAsync();
+}
