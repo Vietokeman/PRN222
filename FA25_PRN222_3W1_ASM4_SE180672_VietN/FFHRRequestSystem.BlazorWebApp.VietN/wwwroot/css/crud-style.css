@@ -1,0 +1,366 @@
+/* Figma CRUD Operations Design - Custom Styles */
+
+:root {
+    --primary-yellow: #FFC107;
+    --primary-yellow-hover: #FFB300;
+    --sidebar-bg: #F5F5F5;
+    --sidebar-active: #FFC107;
+    --text-dark: #333333;
+    --text-gray: #666666;
+    --text-light: #999999;
+    --border-color: #E0E0E0;
+    --white: #FFFFFF;
+    --shadow: 0 2px 8px rgba(0,0,0,0.1);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #FAFAFA;
+    color: var(--text-dark);
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 250px !important;
+    height: 100vh !important;
+    background: linear-gradient(180deg, #FFC107 0%, #FF9800 100%) !important;
+    padding: 30px 0 !important;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
+    z-index: 1000 !important;
+    overflow-y: auto !important;
+    border-right: none !important;
+}
+
+.sidebar-header {
+    padding: 0 25px 30px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.3) !important;
+    margin-bottom: 30px !important;
+    background: transparent !important;
+}
+
+.sidebar-logo {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: var(--white) !important;
+    text-decoration: none !important;
+}
+
+.sidebar-logo:hover {
+    color: var(--white) !important;
+    text-decoration: none !important;
+}
+
+.sidebar-logo i {
+    font-size: 24px !important;
+    color: var(--white) !important;
+}
+
+.user-profile {
+    text-align: center !important;
+    padding: 0 25px 25px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.3) !important;
+    margin-bottom: 25px !important;
+    background: transparent !important;
+}
+
+.user-avatar {
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: 50% !important;
+    margin: 0 auto 15px !important;
+    border: 3px solid var(--white) !important;
+    object-fit: cover !important;
+    background: var(--white) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    color: var(--primary-yellow) !important;
+}
+
+.user-name {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: var(--white) !important;
+    margin-bottom: 5px !important;
+}
+
+.user-role {
+    font-size: 13px !important;
+    color: rgba(255,255,255,0.8) !important;
+    font-weight: 500 !important;
+}
+
+.sidebar-menu {
+    list-style: none !important;
+    padding: 0 15px !important;
+    margin: 0 !important;
+}
+
+.sidebar-menu li {
+    margin-bottom: 8px !important;
+    list-style: none !important;
+}
+
+.sidebar-menu li::before {
+    display: none !important;
+}
+
+.sidebar-menu a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    padding: 12px 15px !important;
+    color: var(--white) !important;
+    text-decoration: none !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    background: transparent !important;
+}
+
+.sidebar-menu a i {
+    font-size: 18px !important;
+    width: 20px !important;
+    text-align: center !important;
+    color: var(--white) !important;
+}
+
+.sidebar-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: var(--white) !important;
+    transform: translateX(5px) !important;
+    text-decoration: none !important;
+}
+
+.sidebar-menu a:hover i {
+    color: var(--white) !important;
+}
+
+.sidebar-menu a.active {
+    background-color: var(--white) !important;
+    color: var(--primary-yellow) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.sidebar-menu a.active i {
+    color: var(--primary-yellow) !important;
+}
+
+.logout-btn {
+    position: absolute !important;
+    bottom: 20px !important;
+    left: 15px !important;
+    right: 15px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    padding: 12px 15px !important;
+    background-color: transparent !important;
+    border: 1px solid rgba(255,255,255,0.5) !important;
+    border-radius: 8px !important;
+    color: var(--white) !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+}
+
+.logout-btn i {
+    font-size: 18px !important;
+    color: var(--white) !important;
+}
+
+.logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    border-color: var(--white) !important;
+    color: var(--white) !important;
+    text-decoration: none !important;
+}
+
+.logout-btn:hover i {
+    color: var(--white) !important;
+}
+
+/* Page Layout Override */
+.page {
+    display: flex !important;
+    min-height: 100vh !important;
+}
+
+.page .sidebar {
+    flex-shrink: 0 !important;
+}
+
+.page .main-content {
+    flex: 1 !important;
+    margin-left: 250px !important;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.content-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.content-header h1 i {
+    color: var(--primary-yellow);
+    font-size: 32px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.badge-success, .badge.bg-success {
+    background-color: #E8F5E9 !important;
+    color: #2E7D32 !important;
+}
+
+.badge-warning, .badge.bg-warning {
+    background-color: #FFF3E0 !important;
+    color: #F57C00 !important;
+}
+
+.badge-danger, .badge.bg-danger {
+    background-color: #FFEBEE !important;
+    color: #D32F2F !important;
+}
+
+.badge-info, .badge.bg-info {
+    background-color: #E3F2FD !important;
+    color: #1976D2 !important;
+}
+
+.badge-secondary, .badge.bg-secondary {
+    background-color: #F5F5F5 !important;
+    color: #616161 !important;
+}
+
+/* Pagination Styles */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 15px 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.pagination {
+    display: flex;
+    gap: 5px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    overflow-x: auto;
+}
+
+.pagination {
+    display: flex;
+    gap: 5px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination li {
+    margin: 0;
+}
+
+.pagination a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    height: 35px;
+    padding: 0 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-gray);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pagination a:hover {
+    background-color: #FFF3E0;
+    border-color: var(--primary-yellow);
+    color: var(--text-dark);
+}
+
+.pagination a.active {
+    background-color: var(--primary-yellow);
+    border-color: var(--primary-yellow);
+    color: var(--white);
+}
+
+.pagination a.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: var(--text-gray);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%) !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding: 20px !important;
+    }
+
+    .page .main-content {
+        margin-left: 0 !important;
+    }
+}

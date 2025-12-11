@@ -1,23 +1,90 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<AuthorizeView>
+    <Authorized>
+        <div class="page">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <a href="/" class="sidebar-logo">
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                        <span>CRUD OPERATIONS</span>
+                    </a>
+                </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        @{
+                            var userName = context.User?.Identity?.Name ?? "Admin";
+                            var firstLetter = userName.Substring(0, 1).ToUpper();
+                        }
+                        @firstLetter
+                    </div>
+                    <div class="user-name">@userName</div>
+                    <div class="user-role">Admin</div>
+                </div>
+
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="/" class="@GetActiveClass("/")">
+                            <i class="bi bi-house-door"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/ticketprocessingvietns" class="@GetActiveClass("/ticketprocessingvietns")">
+                            <i class="bi bi-ticket-perforated"></i>
+                            <span>Tickets</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+                <a href="/account/logout" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                @Body
+            </div>
         </div>
+    </Authorized>
+    <NotAuthorized>
+        <div></div>
+    </NotAuthorized>
+</AuthorizeView>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+@code {
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthState != null)
+        {
+            var authState = await AuthState;
+            if (!authState.User.Identity?.IsAuthenticated ?? true)
+            {
+                var returnUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+                NavigationManager.NavigateTo($"/account/login?returnUrl={Uri.EscapeDataString(returnUrl)}", forceLoad: true);
+            }
+        }
+    }
+
+    private string GetActiveClass(string path)
+    {
+        var currentPath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        
+        if (path == "/" && currentPath == "")
+            return "active";
+        
+        if (path != "/" && currentPath.StartsWith(path.TrimStart('/'), StringComparison.OrdinalIgnoreCase))
+            return "active";
+        
+        return "";
+    }
+}

@@ -1,7 +1,10 @@
 ﻿@page "/ticketprocessingvietns/create"
+@attribute [Authorize]
 @using FFHRRequestSystem.Services.VietN
 @using Microsoft.EntityFrameworkCore
 @using FFHRRequestSystem.Entitites.VietN.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
 @inject NavigationManager NavigationManager
 @inject TicketProcessingVietNService _ticketProcessingService
 @inject ProcessingTypeVietNService _typeService

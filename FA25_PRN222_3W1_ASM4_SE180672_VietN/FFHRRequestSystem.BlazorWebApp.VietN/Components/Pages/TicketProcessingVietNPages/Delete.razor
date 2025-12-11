@@ -1,91 +1,73 @@
 ﻿@page "/ticketprocessingvietns/delete"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using FFHRRequestSystem.Entitites.VietN.Models
 @inject IDbContextFactory<FFHRRequestSystem.Repositories.VietN.DBContext.FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Delete</PageTitle>
+<PageTitle>Delete Ticket Processing</PageTitle>
 
-<h1>Delete</h1>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-danger">
+            <i class="bi bi-trash me-2"></i>Delete Ticket Processing
+        </h2>
+        <a href="/ticketprocessingvietns" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
 
-<p>Are you sure you want to delete this?</p>
-<div>
-    <h2>TicketProcessingVietN</h2>
-    <hr />
-    @if (ticketprocessingvietn is null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else {
-        <dl class="row">
-            <dt class="col-sm-2">ProcessingCode</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.ProcessingCode</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">TicketReference</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.TicketReference</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ProcessingTypeVietNid</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.ProcessingTypeVietNid</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ProcessingAction</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.ProcessingAction</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ActionDescription</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.ActionDescription</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">RelatedTicketCode</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.RelatedTicketCode</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">PriorityLevel</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.PriorityLevel</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Status</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.Status</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">OverdueDays</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.OverdueDays</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">EscalationLevel</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.EscalationLevel</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">IsAutoProcessed</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.IsAutoProcessed</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ProcessedBy</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.ProcessedBy</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ProcessedDate</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.ProcessedDate</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ResolvedNote</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.ResolvedNote</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">CreatedDate</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.CreatedDate</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ModifiedDate</dt>
-            <dd class="col-sm-10">@ticketprocessingvietn.ModifiedDate</dd>
-        </dl>
-        <EditForm method="post" Model="ticketprocessingvietn" OnValidSubmit="DeleteTicketProcessingVietN" FormName="delete" Enhance>
-            <button type="submit" class="btn btn-danger" disabled="@(ticketprocessingvietn is null)">Delete</button> |
-            <a href="/ticketprocessingvietns">Back to List</a>
-        </EditForm>
-    }
+    <div class="alert alert-warning" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Warning!</strong> Are you sure you want to delete this ticket processing record?
+    </div>
+
+    <div>
+        @if (ticketprocessingvietn is null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Ticket Processing Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Processing Code</dt>
+                        <dd class="col-sm-9">@ticketprocessingvietn.ProcessingCode</dd>
+                        <dt class="col-sm-3">Ticket Reference</dt>
+                        <dd class="col-sm-9">@ticketprocessingvietn.TicketReference</dd>
+                        <dt class="col-sm-3">Processing Action</dt>
+                        <dd class="col-sm-9">@ticketprocessingvietn.ProcessingAction</dd>
+                        <dt class="col-sm-3">Action Description</dt>
+                        <dd class="col-sm-9">@ticketprocessingvietn.ActionDescription</dd>
+                        <dt class="col-sm-3">Priority Level</dt>
+                        <dd class="col-sm-9">@ticketprocessingvietn.PriorityLevel</dd>
+                        <dt class="col-sm-3">Status</dt>
+                        <dd class="col-sm-9">@ticketprocessingvietn.Status</dd>
+                        <dt class="col-sm-3">Created Date</dt>
+                        <dd class="col-sm-9">@ticketprocessingvietn.CreatedDate</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <EditForm method="post" Model="ticketprocessingvietn" OnValidSubmit="DeleteTicketProcessingVietN" FormName="delete" Enhance>
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="/ticketprocessingvietns" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger" disabled="@(ticketprocessingvietn is null)">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        }
+    </div>
 </div>
 
 @code {

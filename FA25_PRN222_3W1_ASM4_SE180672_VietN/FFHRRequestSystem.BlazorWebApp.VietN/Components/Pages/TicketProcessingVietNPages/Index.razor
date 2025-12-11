@@ -1,53 +1,275 @@
 ﻿@page "/ticketprocessingvietns"
+@attribute [Authorize]
 @using FFHRRequestSystem.Services.VietN
 @using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using FFHRRequestSystem.Entitites.VietN.Models
-@using FFHRRequestSystem.Repositories.VietN.DBContext
-@* @implements IAsyncDisposable *@
-@* @inject IDbContextFactory<FFHRRequestSystem.Repositories.VietN.DBContext.FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext> DbFactory *@
+@using Microsoft.AspNetCore.Authorization
 @inject FFHRRequestSystem.Services.VietN.TicketProcessingVietNService _ticketService
-<PageTitle>Index</PageTitle>
+@rendermode InteractiveServer
+<PageTitle>Tickets Management</PageTitle>
 
-<h1>Index</h1>
+<div class="content-header">
+    <h1><i class="bi bi-ticket-perforated"></i> Tickets Management</h1>
+    <div class="header-actions">
+        <a href="ticketprocessingvietns/create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> ADD NEW TICKET
+        </a>
+    </div>
+</div>
 
-<p>
-    <a href="ticketprocessingvietns/create">Create New</a>
-</p>
-
-<QuickGrid Class="table" Items="ticketProcessingVietNs">
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ProcessingCode" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.TicketReference" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ProcessingTypeVietNid" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ProcessingAction" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ActionDescription" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.RelatedTicketCode" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.PriorityLevel" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.Status" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.OverdueDays" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.EscalationLevel" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.IsAutoProcessed" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ProcessedBy" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ProcessedDate" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ResolvedNote" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.CreatedDate" />
-    <PropertyColumn Property="ticketprocessingvietn => ticketprocessingvietn.ModifiedDate" />
-
-    <TemplateColumn Context="ticketprocessingvietn">
-        <a href="@($"ticketprocessingvietns/edit?ticketprocessingvietnid={ticketprocessingvietn.TicketProcessingVietNid}")">Edit</a> |
-        <a href="@($"ticketprocessingvietns/details?ticketprocessingvietnid={ticketprocessingvietn.TicketProcessingVietNid}")">Details</a> |
-        <a href="@($"ticketprocessingvietns/delete?ticketprocessingvietnid={ticketprocessingvietn.TicketProcessingVietNid}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+<!-- Data Table -->
+<div class="card shadow-sm">
+    <div class="card-header" style="background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%); color: white;">
+        <h5 class="mb-0"><i class="bi bi-table"></i> Ticket Processing Records</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="font-size: 14px;">
+                <thead style="background-color: #f8f9fa; position: sticky; top: 0; z-index: 10;">
+                    <tr>
+                        <th style="padding: 15px 10px; font-weight: 600;">Code</th>
+                        <th style="padding: 15px 10px; font-weight: 600;">Ticket Ref</th>
+                        <th style="padding: 15px 10px; font-weight: 600;">Type</th>
+                        <th style="padding: 15px 10px; font-weight: 600;">Action</th>
+                        <th style="padding: 15px 10px; font-weight: 600;">Description</th>
+                        <th style="padding: 15px 10px; font-weight: 600;">Priority</th>
+                        <th style="padding: 15px 10px; font-weight: 600;">Status</th>
+                        <th style="padding: 15px 10px; font-weight: 600;">Overdue</th>
+                        <th style="padding: 15px 10px; font-weight: 600;">Auto</th>
+                        <th style="padding: 15px 10px; font-weight: 600;">Processed By</th>
+                        <th style="padding: 15px 10px; font-weight: 600;">Created</th>
+                        <th style="padding: 15px 10px; text-align: center; font-weight: 600;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in pagedTickets)
+                    {
+                        <tr style="border-bottom: 1px solid #e9ecef;">
+                            <td style="padding: 12px 10px; vertical-align: middle;">
+                                <strong>@item.ProcessingCode</strong>
+                            </td>
+                            <td style="padding: 12px 10px; vertical-align: middle;">@item.TicketReference</td>
+                            <td style="padding: 12px 10px; vertical-align: middle;">
+                                <span class="text-muted">@item.ProcessingTypeVietN?.TypeName</span>
+                            </td>
+                            <td style="padding: 12px 10px; vertical-align: middle;">@item.ProcessingAction</td>
+                            <td style="padding: 12px 10px; vertical-align: middle; max-width: 200px;">
+                                <span title="@item.ActionDescription" style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    @item.ActionDescription
+                                </span>
+                            </td>
+                            <td style="padding: 12px 10px; vertical-align: middle;">
+                                @{
+                                    var (priorityText, priorityClass, priorityIcon) = item.PriorityLevel switch
+                                    {
+                                        3 => ("High", "badge bg-danger", "bi-exclamation-triangle-fill"),
+                                        2 => ("Medium", "badge bg-warning", "bi-exclamation-circle-fill"),
+                                        _ => ("Low", "badge bg-secondary", "bi-info-circle-fill")
+                                    };
+                                }
+                                <span class="@priorityClass" style="padding: 6px 12px; border-radius: 20px; font-size: 12px;">
+                                    <i class="bi @priorityIcon"></i> @priorityText
+                                </span>
+                            </td>
+                            <td style="padding: 12px 10px; vertical-align: middle;">
+                                @{
+                                    var (statusText, statusClass, statusIcon) = item.Status switch
+                                    {
+                                        1 => ("Active", "badge bg-success", "bi-play-circle-fill"),
+                                        2 => ("Resolved", "badge bg-info", "bi-check-circle-fill"),
+                                        3 => ("Closed", "badge bg-secondary", "bi-x-circle-fill"),
+                                        _ => ("Unknown", "badge bg-secondary", "bi-question-circle-fill")
+                                    };
+                                }
+                                <span class="@statusClass" style="padding: 6px 12px; border-radius: 20px; font-size: 12px;">
+                                    <i class="bi @statusIcon"></i> @statusText
+                                </span>
+                            </td>
+                            <td style="padding: 12px 10px; vertical-align: middle;">
+                                @if (item.OverdueDays > 0)
+                                {
+                                    <span class="text-danger fw-bold">@item.OverdueDays</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">@item.OverdueDays</span>
+                                }
+                            </td>
+                            <td style="padding: 12px 10px; vertical-align: middle; text-align: center;">
+                                @if (item.IsAutoProcessed == true)
+                                {
+                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 18px;"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-x-circle-fill text-danger" style="font-size: 18px;"></i>
+                                }
+                            </td>
+                            <td style="padding: 12px 10px; vertical-align: middle;">
+                                <span class="text-primary fw-semibold">@item.ProcessedBy</span>
+                            </td>
+                            <td style="padding: 12px 10px; vertical-align: middle;">
+                                <small class="text-muted">@item.CreatedDate?.ToString("yyyy-MM-dd")</small>
+                            </td>
+                            <td style="padding: 12px 10px; vertical-align: middle; text-align: center;">
+                                <div class="btn-group" role="group">
+                                    <a href="@($"ticketprocessingvietns/details?ticketprocessingvietnid={item.TicketProcessingVietNid}")" 
+                                       class="btn btn-sm btn-info" 
+                                       title="Details"
+                                       style="border-radius: 6px 0 0 6px;">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="@($"ticketprocessingvietns/edit?ticketprocessingvietnid={item.TicketProcessingVietNid}")" 
+                                       class="btn btn-sm btn-warning" 
+                                       title="Edit"
+                                       style="border-radius: 0;">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="@($"ticketprocessingvietns/delete?ticketprocessingvietnid={item.TicketProcessingVietNid}")" 
+                                       class="btn btn-sm btn-danger" 
+                                       title="Delete"
+                                       style="border-radius: 0 6px 6px 0;">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                <span class="text-muted">
+                    Showing <strong>@FromEntry</strong> to <strong>@ToEntry</strong> of <strong>@totalItems</strong> entries
+                </span>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <label class="mb-0 text-muted" style="font-size: 14px;">Show:</label>
+                    <select class="form-select form-select-sm" style="width: auto;" @onchange="HandlePageSizeChange">
+                        @foreach (var size in PageSizeOptions)
+                        {
+                            <option value="@size" selected="@(size == pageSize)">@size</option>
+                        }
+                    </select>
+                </div>
+                
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                            <button class="page-link" @onclick="() => ChangePage(1)" disabled="@(currentPage == 1)">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </button>
+                        </li>
+                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                            <button class="page-link" @onclick="() => ChangePage(currentPage - 1)" disabled="@(currentPage == 1)">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                        </li>
+                        
+                        @foreach (var pageNum in GetPageNumbers())
+                        {
+                            <li class="page-item @(pageNum == currentPage ? "active" : "")">
+                                <button class="page-link" @onclick="() => ChangePage(pageNum)">
+                                    @pageNum
+                                </button>
+                            </li>
+                        }
+                        
+                        <li class="page-item @(currentPage == TotalPages ? "disabled" : "")">
+                            <button class="page-link" @onclick="() => ChangePage(currentPage + 1)" disabled="@(currentPage == TotalPages)">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </li>
+                        <li class="page-item @(currentPage == TotalPages ? "disabled" : "")">
+                            <button class="page-link" @onclick="() => ChangePage(TotalPages)" disabled="@(currentPage == TotalPages)">
+                                <i class="bi bi-chevron-double-right"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
-    // private FA25_PRN222_3W_PRN222_01_G4_FacilityFeedbackHelpdeskRequestSystemContext context = default!;
-    private IQueryable<TicketProcessingVietN> ticketProcessingVietNs = default!;
+    private List<TicketProcessingVietN> allTickets = new();
+    private List<TicketProcessingVietN> pagedTickets = new();
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private int totalItems = 0;
+    private int[] PageSizeOptions = new[] { 5, 10, 25, 50, 100 };
+
+    private int TotalPages => (int)Math.Ceiling((double)totalItems / pageSize);
+    private int FromEntry => totalItems == 0 ? 0 : (currentPage - 1) * pageSize + 1;
+    private int ToEntry => Math.Min(currentPage * pageSize, totalItems);
 
     protected override async Task OnInitializedAsync()
     {
-        ticketProcessingVietNs = (await _ticketService.GetAllAsync()).AsQueryable();
+        await LoadData();
     }
 
-    // public async ValueTask DisposeAsync() => await ticketProcessingVietNs.DisposeAsync();
+    private async Task LoadData()
+    {
+        allTickets = await _ticketService.GetAllAsync();
+        totalItems = allTickets.Count;
+        UpdatePagedTickets();
+    }
+
+    private void UpdatePagedTickets()
+    {
+        pagedTickets = allTickets
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    private void ChangePage(int newPage)
+    {
+        if (newPage >= 1 && newPage <= TotalPages)
+        {
+            currentPage = newPage;
+            UpdatePagedTickets();
+            StateHasChanged();
+        }
+    }
+
+    private void HandlePageSizeChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int newSize))
+        {
+            pageSize = newSize;
+            currentPage = 1;
+            UpdatePagedTickets();
+            StateHasChanged();
+        }
+    }
+
+    private List<int> GetPageNumbers()
+    {
+        var pages = new List<int>();
+        var maxPagesToShow = 5;
+        var halfRange = maxPagesToShow / 2;
+
+        var startPage = Math.Max(1, currentPage - halfRange);
+        var endPage = Math.Min(TotalPages, startPage + maxPagesToShow - 1);
+
+        if (endPage - startPage < maxPagesToShow - 1)
+        {
+            startPage = Math.Max(1, endPage - maxPagesToShow + 1);
+        }
+
+        for (int i = startPage; i <= endPage; i++)
+        {
+            pages.Add(i);
+        }
+
+        return pages;
+    }
 }
+
