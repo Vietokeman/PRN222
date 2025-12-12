@@ -127,23 +127,6 @@
             </div>
         </div>
 
-        <!-- System Fields Section -->
-        <div class="form-section">
-            <h3 class="form-section-title">System Information</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label asp-for="CreatedDate">Created Date</label>
-                    <input asp-for="CreatedDate" type="datetime-local" class="form-control" />
-                    <span asp-validation-for="CreatedDate" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="ModifiedDate">Modified Date</label>
-                    <input asp-for="ModifiedDate" type="datetime-local" class="form-control" />
-                    <span asp-validation-for="ModifiedDate" class="text-danger"></span>
-                </div>
-            </div>
-        </div>
-
         <!-- Form Actions -->
         <div class="form-actions">
             <a asp-action="Index" class="btn-secondary">

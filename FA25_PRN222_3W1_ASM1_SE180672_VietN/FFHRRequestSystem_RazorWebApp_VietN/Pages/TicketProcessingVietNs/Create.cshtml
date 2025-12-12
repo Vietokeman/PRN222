@@ -123,19 +123,14 @@
                 <div class="card mb-4 shadow-sm">
                     <div class="card-header bg-warning text-dark">
                         <h5 class="mb-0">
-                            <i class="bi bi-sticky me-2"></i>Additional Notes & Dates
+                            <i class="bi bi-sticky me-2"></i>Additional Notes
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label asp-for="TicketProcessingVietN.CreatedDate" class="form-label fw-bold">Created Date</label>
-                                <input asp-for="TicketProcessingVietN.CreatedDate" class="form-control" readonly />
-                                <span asp-validation-for="TicketProcessingVietN.CreatedDate" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label asp-for="TicketProcessingVietN.ResolvedNote" class="form-label fw-bold">Resolved Note</label>
-                                <textarea asp-for="TicketProcessingVietN.ResolvedNote" class="form-control" rows="2"></textarea>
+                                <textarea asp-for="TicketProcessingVietN.ResolvedNote" class="form-control" rows="3"></textarea>
                                 <span asp-validation-for="TicketProcessingVietN.ResolvedNote" class="text-danger"></span>
                             </div>
                         </div>
@@ -186,6 +181,30 @@
             }).showToast();
         }
 
+        function validateForm() {
+            const processingCode = document.getElementById("TicketProcessingVietN_ProcessingCode").value;
+            const ticketReference = document.getElementById("TicketProcessingVietN_TicketReference").value;
+            const processingTypeId = document.getElementById("TicketProcessingVietN_ProcessingTypeVietNid").value;
+            const processingAction = document.getElementById("TicketProcessingVietN_ProcessingAction").value;
+            const priorityLevel = document.getElementById("TicketProcessingVietN_PriorityLevel").value;
+            const status = document.getElementById("TicketProcessingVietN_Status").value;
+
+            let errors = [];
+            
+            if (!processingCode?.trim()) errors.push("Processing Code is required");
+            if (!ticketReference?.trim()) errors.push("Ticket Reference is required");
+            if (!processingTypeId) errors.push("Processing Type is required");
+            if (!processingAction?.trim()) errors.push("Processing Action is required");
+            if (!priorityLevel) errors.push("Priority Level is required");
+            if (!status) errors.push("Status is required");
+
+            if (errors.length > 0) {
+                showToast(errors.join("\n"), "error");
+                return false;
+            }
+            return true;
+        }
+
         var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
 
         connection.start().then(function () {
@@ -201,6 +220,11 @@
         btnHubCreate?.addEventListener("click", function (event) {
             event.preventDefault();
 
+            // Validate form before sending
+            if (!validateForm()) {
+                return;
+            }
+
             var dataObj = JSON.stringify({
                 TicketProcessingVietNid: generateGuid(),
                 ProcessingCode: document.getElementById("TicketProcessingVietN_ProcessingCode").value,
@@ -211,30 +235,34 @@
                 RelatedTicketCode: document.getElementById("TicketProcessingVietN_RelatedTicketCode").value,
                 PriorityLevel: document.getElementById("TicketProcessingVietN_PriorityLevel").value,
                 Status: document.getElementById("TicketProcessingVietN_Status").value,
-                OverdueDays: document.getElementById("TicketProcessingVietN_OverdueDays").value,
-                EscalationLevel: document.getElementById("TicketProcessingVietN_EscalationLevel").value,
-                IsAutoProcessed: document.getElementById("TicketProcessingVietN_IsAutoProcessed").checked,
-                ProcessedBy: document.getElementById("TicketProcessingVietN_ProcessedBy").value,
-                ResolvedNote: document.getElementById("TicketProcessingVietN_ResolvedNote").value,
-                CreatedDate: document.getElementById("TicketProcessingVietN_CreatedDate").value,
-                ModifiedDate: document.getElementById("TicketProcessingVietN_ModifiedDate")?.value,
+                OverdueDays: document.getElementById("TicketProcessingVietN_OverdueDays").value || 0,
+                EscalationLevel: document.getElementById("TicketProcessingVietN_EscalationLevel").value || 0,
+                IsAutoProcessed: document.getElementById("TicketProcessingVietN_IsAutoProcessed")?.checked || false,
+                ProcessedBy: document.getElementById("TicketProcessingVietN_ProcessedBy").value || "VietN",
+                ResolvedNote: document.getElementById("TicketProcessingVietN_ResolvedNote").value || "",
+                CreatedDate: new Date().toISOString(),
+                ModifiedDate: new Date().toISOString(),
                 TypeName: document.querySelector("#TicketProcessingVietN_ProcessingTypeVietNid option:checked")?.text || ""
             });
 
             showToast("Sending ticket creation request...", "info");
+            console.log("[SignalR] Sending HubCreate with data:", dataObj);
             
             connection.invoke("HubCreate", dataObj)
                 .then(function() {
                     console.log("[SignalR] HubCreate invoked successfully");
-                    showToast("Ticket creation request sent! Check Index page for updates.", "success");
+                    showToast("Ticket created successfully via SignalR! Redirecting...", "success");
                     
-                    // Optionally redirect after 2 seconds
+                    // Clear the form
+                    document.querySelector("form").reset();
+                    
+                    // Redirect after 2 seconds
                     setTimeout(function() {
                         window.location.href = '/TicketProcessingVietNs';
                     }, 2000);
                 })
                 .catch(function (err) {
-                    console.error(err.toString());
+                    console.error("[SignalR] Error:", err.toString());
                     showToast("Failed to create ticket: " + err.toString(), "error");
                     return console.error(err.toString());
                 });

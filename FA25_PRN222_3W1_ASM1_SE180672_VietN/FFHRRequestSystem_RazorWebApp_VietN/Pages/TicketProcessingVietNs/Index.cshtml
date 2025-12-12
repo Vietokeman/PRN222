@@ -49,7 +49,7 @@
                     </tr>
                 </thead>
                     <tbody>
-                        @foreach (var item in Model.TicketProcessingVietN)
+                        @foreach (var item in Model.PagedTickets)
                         {
                             <tr data-id="@item.TicketProcessingVietNid">
                                 <td>@item.ProcessingCode</td>
@@ -135,34 +135,124 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination -->
+        <style>
+            .pagination-link { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #666; cursor: pointer; }
+            .pagination-link:hover { background-color: rgba(0, 123, 255, 0.17); }
+            .pagination-link.disabled { color: #999; cursor: not-allowed; opacity: 0.5; pointer-events: none; }
+            .pagination-link.active { background-color: #007bff; color: white; border-color: #007bff; }
+        </style>
+        
+        <div class="pagination-container" style="padding: 20px; display: flex; align-items: center; justify-content: space-between;">
+            <div class="pagination-info">
+                <span style="color: #666;">
+                    Showing <strong>@Model.FromEntry</strong> to <strong>@Model.ToEntry</strong> of <strong>@Model.TotalItems</strong> entries
+                </span>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label style="margin: 0; color: #666;">Show:</label>
+                    <select id="pageSizeSelect" onchange="changePage(this)" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        @foreach (var size in Model.PageSizeOptions)
+                        {
+                            <option value="@size" selected="@(size == Model.PageSize)">@size</option>
+                        }
+                    </select>
+                </div>
+                
+                <nav>
+                    <ul style="list-style: none; margin: 0; padding: 0; display: flex; gap: 5px;">
+                        <!-- First Page -->
+                        <li>
+                            @if (Model.CurrentPage == 1)
+                            {
+                                <span class="pagination-link disabled"><i class="bi bi-chevron-double-left"></i></span>
+                            }
+                            else
+                            {
+                                <a asp-page="./Index" asp-route-currentpage="1" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" 
+                                   class="pagination-link"><i class="bi bi-chevron-double-left"></i></a>
+                            }
+                        </li>
+                        
+                        <!-- Previous Page -->
+                        <li>
+                            @if (Model.CurrentPage == 1)
+                            {
+                                <span class="pagination-link disabled"><i class="bi bi-chevron-left"></i></span>
+                            }
+                            else
+                            {
+                                <a asp-page="./Index" asp-route-currentpage="@(Model.CurrentPage - 1)" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" 
+                                   class="pagination-link"><i class="bi bi-chevron-left"></i></a>
+                            }
+                        </li>
+                        
+                        <!-- Page Numbers -->
+                        @foreach (var pageNum in Model.GetPageNumbers())
+                        {
+                            <li>
+                                @if (pageNum == Model.CurrentPage)
+                                {
+                                    <span class="pagination-link active">@pageNum</span>
+                                }
+                                else
+                                {
+                                    <a asp-page="./Index" asp-route-currentpage="@pageNum" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" 
+                                       class="pagination-link">@pageNum</a>
+                                }
+                            </li>
+                        }
+                        
+                        <!-- Next Page -->
+                        <li>
+                            @if (Model.CurrentPage == Model.TotalPages)
+                            {
+                                <span class="pagination-link disabled"><i class="bi bi-chevron-right"></i></span>
+                            }
+                            else
+                            {
+                                <a asp-page="./Index" asp-route-currentpage="@(Model.CurrentPage + 1)" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" 
+                                   class="pagination-link"><i class="bi bi-chevron-right"></i></a>
+                            }
+                        </li>
+                        
+                        <!-- Last Page -->
+                        <li>
+                            @if (Model.CurrentPage == Model.TotalPages)
+                            {
+                                <span class="pagination-link disabled"><i class="bi bi-chevron-double-right"></i></span>
+                            }
+                            else
+                            {
+                                <a asp-page="./Index" asp-route-currentpage="@Model.TotalPages" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" 
+                                   class="pagination-link"><i class="bi bi-chevron-double-right"></i></a>
+                            }
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+function changePage(select) {
+    var pageSize = select.value;
+    var currentUrl = window.location.href;
+    var newUrl = new URL(currentUrl);
+    newUrl.searchParams.set('pageSize', pageSize);
+    newUrl.searchParams.set('currentPage', '1');
+    window.location.href = newUrl.toString();
+}
+</script>
+
 @section Scripts {
     <script src="~/lib/jquery/jquery.min.js"></script>
-    <script src="~/table-pagination.js"></script>
     <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script>
-        var paginationSettings = {
-            rowPerPage: 10,  
-            paginationColor: '#007bff',  
-            fontColor: '#333',  
-            transitionDuration: 300  
-        };
-
-        function initPagination() {
-            // Remove existing pagination first
-            var tableId = 'ticketProcessingTable';
-            $('.pagintaion-container-' + tableId).remove();
-            $('.page-list-table-' + tableId).remove();
-            $('#pagintaion-' + tableId).remove();
-            
-            // Show all rows before reinitializing
-            $('#ticketProcessingTable tbody tr').show();
-            
-            // Reinitialize pagination
-            $('#ticketProcessingTable').createTablePagination(paginationSettings);
-        }
-
         // Toast notification helper
         function showToast(message, type = 'success') {
             const bgColors = {
@@ -184,66 +274,9 @@
             }).showToast();
         }
 
-        $(document).ready(function() {
-            initPagination();
-            
-            // Show TempData messages
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <text>
-                showToast('@TempData["SuccessMessage"]', 'success');
-                </text>
-            }
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <text>
-                showToast('@TempData["ErrorMessage"]', 'error');
-                </text>
-            }
-            @if (TempData["InfoMessage"] != null)
-            {
-                <text>
-                showToast('@TempData["InfoMessage"]', 'info');
-                </text>
-            }
-            
-            // Quick search functionality
-            $('#quickSearch').on('keyup', function() {
-                var searchTerm = $(this).val().toLowerCase();
-                
-                $('#ticketProcessingTable tbody tr').each(function() {
-                    var rowText = $(this).text().toLowerCase();
-                    if (rowText.indexOf(searchTerm) === -1) {
-                        $(this).hide();
-                    } else {
-                        $(this).show();
-                    }
-                });
-                
-                // Reinitialize pagination after search
-                initPagination();
-            });
-        });
-
-        "use strict";
-
-        var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
-
-        connection.start().then(function () {
-            console.log("[SignalR] Connected to NotificationHub");
-            console.log("[SignalR] Connection ID:", connection.connectionId);
-        }).catch(function (err) {
-            console.error("[SignalR] Connection failed:", err.toString());
-            return console.error(err.toString());
-        });
-
-        function parsePayload(payload) {
-            return typeof payload === 'string' ? JSON.parse(payload) : payload;
-        }
-
-        function buildBadge(value, map) {
-            const def = map.default || { text: '', cls: '' };
-            return map[value] || def;
+        function truncate(text, length) {
+            if (!text) return '';
+            return text.length > length ? text.substring(0, length) + '...' : text;
         }
 
         function formatDate(dateValue) {
@@ -253,25 +286,18 @@
             return date.toISOString().split('T')[0];
         }
 
-        function truncate(text, length) {
-            if (!text) return '';
-            return text.length > length ? text.substring(0, length) + '...' : text;
-        }
-
         function renderRow(data) {
-            const priority = buildBadge(data.PriorityLevel, {
+            const priority = {
                 3: { text: 'High', cls: 'badge-danger' },
                 2: { text: 'Medium', cls: 'badge-warning' },
-                1: { text: 'Low', cls: 'badge-secondary' },
-                default: { text: 'Unknown', cls: 'badge-secondary' }
-            });
+                1: { text: 'Low', cls: 'badge-secondary' }
+            }[data.PriorityLevel] || { text: 'Unknown', cls: 'badge-secondary' };
 
-            const status = buildBadge(data.Status, {
+            const status = {
                 1: { text: 'Active', cls: 'badge-success' },
                 2: { text: 'Resolved', cls: 'badge-info' },
-                3: { text: 'Closed', cls: 'badge-secondary' },
-                default: { text: 'Unknown', cls: 'badge-secondary' }
-            });
+                3: { text: 'Closed', cls: 'badge-secondary' }
+            }[data.Status] || { text: 'Unknown', cls: 'badge-secondary' };
 
             const autoBadge = data.IsAutoProcessed
                 ? '<span class="badge badge-info">Auto</span>'
@@ -309,99 +335,77 @@
                 </tr>`;
         }
 
+        "use strict";
+
+        var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
+
+        connection.start().then(function () {
+            console.log("[SignalR] Connected to NotificationHub");
+            console.log("[SignalR] Connection ID:", connection.connectionId);
+        }).catch(function (err) {
+            console.error("[SignalR] Connection failed:", err.toString());
+            return console.error(err.toString());
+        });
+
+        function parsePayload(payload) {
+            return typeof payload === 'string' ? JSON.parse(payload) : payload;
+        }
+
         connection.on("ReceiverCreate", function (payload) {
             console.log("[SignalR] ReceiverCreate triggered!");
-            console.log("[SignalR] Raw payload:", payload);
-            
             const data = parsePayload(payload);
-            console.log("[SignalR] Parsed entity:", data);
-            
             if (!data) {
                 console.error("[SignalR] Failed to parse data");
-                showToast("Failed to create ticket - Invalid data", "error");
                 return;
             }
-            
-            // Add new row at the top
             const newRow = renderRow(data);
-            console.log("[SignalR] Generated row HTML:", newRow);
-            
             $('#ticketProcessingTable tbody').prepend(newRow);
-            console.log("[SignalR] Row inserted successfully");
-            
-            // Reinitialize pagination to update page count and show new row
-            initPagination();
-            console.log("[SignalR] Pagination refreshed");
-            
-            // Highlight the new row briefly
-            $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
-                .css('background-color', '#d4edda')
-                .animate({ backgroundColor: 'transparent' }, 2000);
-            
             showToast(`Ticket "${data.ProcessingCode}" created successfully via SignalR!`, "success");
-            console.log("[SignalR] ReceiverCreate completed!");
         });
 
         connection.on("ReceiverUpdate", function (payload) {
             console.log("[SignalR] ReceiverUpdate triggered!");
-            console.log("[SignalR] Raw payload:", payload);
-            
             const data = parsePayload(payload);
-            console.log("[SignalR] Parsed entity:", data);
-            
             if (!data) {
                 console.error("[SignalR] Failed to parse data");
-                showToast("Failed to update ticket - Invalid data", "error");
                 return;
             }
-            
             const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${data.TicketProcessingVietNid}']`);
-            console.log("[SignalR] Found row:", row.length > 0 ? "Yes" : "No");
-            
-            const newRow = renderRow(data);
-            console.log("[SignalR] Generated row HTML:", newRow);
-            
             if (row.length > 0) {
-                row.replaceWith(newRow);
-                console.log("[SignalR] Row replaced successfully");
-                
-                // Reinitialize pagination to update display
-                initPagination();
-                console.log("[SignalR] Pagination refreshed");
-                
-                // Highlight updated row
-                $(`#ticketProcessingTable tbody tr[data-id='${data.TicketProcessingVietNid}']`)
-                    .css('background-color', '#fff3cd')
-                    .animate({ backgroundColor: 'transparent' }, 2000);
-                
+                row.replaceWith(renderRow(data));
                 showToast(`Ticket "${data.ProcessingCode}" updated successfully via SignalR!`, "info");
-                console.log("[SignalR] ReceiverUpdate completed!");
-            } else {
-                console.warn("[SignalR] Row not found, cannot update");
-                showToast("Ticket not found in table", "warning");
             }
         });
 
         connection.on("ReceiverDelete", function (ticketProcessingVietNid) {
             console.log("[SignalR] ReceiverDelete triggered!");
-            console.log("[SignalR] Deleting ID:", ticketProcessingVietNid);
-            
             const row = $('#ticketProcessingTable tbody').find(`tr[data-id='${ticketProcessingVietNid}']`);
-            console.log("[SignalR] Found row:", row.length > 0 ? "Yes" : "No");
-            
             if (row.length > 0) {
                 row.remove();
-                console.log("[SignalR] Row deleted successfully");
-                
-                // Reinitialize pagination to update page count after deletion
-                initPagination();
-                console.log("[SignalR] Pagination refreshed");
-                
                 showToast("Ticket deleted successfully via SignalR!", "warning");
-                console.log("[SignalR] ReceiverDelete completed!");
-            } else {
-                console.warn("[SignalR] Row not found, cannot delete");
-                showToast("Ticket not found in table", "error");
+            }
+        });
+    </script>
+
+        // Show TempData messages
+        $(document).ready(function() {
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                showToast('@TempData["SuccessMessage"]', 'success');
+                </text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                showToast('@TempData["ErrorMessage"]', 'error');
+                </text>
+            }
+            @if (TempData["InfoMessage"] != null)
+            {
+                <text>
+                showToast('@TempData["InfoMessage"]', 'info');
+                </text>
             }
         });
     </script>

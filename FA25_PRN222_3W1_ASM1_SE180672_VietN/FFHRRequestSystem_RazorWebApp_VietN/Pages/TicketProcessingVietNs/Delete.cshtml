@@ -5,12 +5,31 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-danger">
+            <i class="bi bi-trash me-2"></i>Delete Ticket Processing
+        </h2>
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>TicketProcessingVietN</h4>
-    <hr />
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Confirm Deletion
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-circle me-2"></i><strong>Warning:</strong> This action cannot be undone. Please confirm you want to delete this ticket.
+                    </div>
+
+                    <h5 class="mb-3 mt-4">Ticket Details</h5>
+                    <dl class="row">
     <dl class="row">
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.TicketProcessingVietN.ProcessingCode)
@@ -18,129 +37,118 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.TicketProcessingVietN.ProcessingCode)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.TicketReference)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.TicketReference)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.ProcessingAction)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.ProcessingAction)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.ActionDescription)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.ActionDescription)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.RelatedTicketCode)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.RelatedTicketCode)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.PriorityLevel)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.PriorityLevel)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.Status)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.Status)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.OverdueDays)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.OverdueDays)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.EscalationLevel)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.EscalationLevel)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.IsAutoProcessed)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.IsAutoProcessed)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.ProcessedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.ProcessedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.ProcessedDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.ProcessedDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.ResolvedNote)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.ResolvedNote)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.CreatedDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.CreatedDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.ModifiedDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.ModifiedDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketProcessingVietN.ProcessingTypeVietN)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TicketProcessingVietN.ProcessingTypeVietN.TypeCode)
-        </dd>
-    </dl>
-    
-    <form method="post">
-        <input type="hidden" asp-for="TicketProcessingVietN.TicketProcessingVietNid" />
-        <input type="submit" value="Delete" class="btn btn-danger" />
-        <button type="button" id="btnHubDelete" class="btn btn-warning ms-2">
-            <i class="bi bi-broadcast"></i> Delete via SignalR
-        </button> |
-        <a asp-page="./Index">Back to List</a>
-    </form>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <dt class="fw-bold">@Html.DisplayNameFor(model => model.TicketProcessingVietN.ProcessingCode)</dt>
+                            <dd>@Html.DisplayFor(model => model.TicketProcessingVietN.ProcessingCode)</dd>
+                        </div>
+                        <div class="col-sm-6">
+                            <dt class="fw-bold">@Html.DisplayNameFor(model => model.TicketProcessingVietN.TicketReference)</dt>
+                            <dd>@Html.DisplayFor(model => model.TicketProcessingVietN.TicketReference)</dd>
+                        </div>
+                        <div class="col-sm-6">
+                            <dt class="fw-bold">@Html.DisplayNameFor(model => model.TicketProcessingVietN.ProcessingAction)</dt>
+                            <dd>@Html.DisplayFor(model => model.TicketProcessingVietN.ProcessingAction)</dd>
+                        </div>
+                        <div class="col-sm-6">
+                            <dt class="fw-bold">@Html.DisplayNameFor(model => model.TicketProcessingVietN.Status)</dt>
+                            <dd>@Html.DisplayFor(model => model.TicketProcessingVietN.Status)</dd>
+                        </div>
+                        <div class="col-sm-6">
+                            <dt class="fw-bold">@Html.DisplayNameFor(model => model.TicketProcessingVietN.PriorityLevel)</dt>
+                            <dd>@Html.DisplayFor(model => model.TicketProcessingVietN.PriorityLevel)</dd>
+                        </div>
+                        <div class="col-sm-6">
+                            <dt class="fw-bold">@Html.DisplayNameFor(model => model.TicketProcessingVietN.ProcessedBy)</dt>
+                            <dd>@Html.DisplayFor(model => model.TicketProcessingVietN.ProcessedBy)</dd>
+                        </div>
+                        <div class="col-sm-12">
+                            <dt class="fw-bold">@Html.DisplayNameFor(model => model.TicketProcessingVietN.ActionDescription)</dt>
+                            <dd>@Html.DisplayFor(model => model.TicketProcessingVietN.ActionDescription)</dd>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="d-flex gap-2">
+                        <form method="post" style="display: inline;">
+                            <input type="hidden" asp-for="TicketProcessingVietN.TicketProcessingVietNid" />
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Delete Permanently
+                            </button>
+                        </form>
+                        <button type="button" id="btnHubDelete" class="btn btn-warning">
+                            <i class="bi bi-broadcast"></i> Delete via SignalR
+                        </button>
+                        <a asp-page="./Index" class="btn btn-secondary ms-auto">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script>
         "use strict";
-        
+
+        // Toast notification helper
+        function showToast(message, type = 'success') {
+            const bgColors = {
+                success: 'linear-gradient(to right, #00b09b, #96c93d)',
+                error: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                info: 'linear-gradient(to right, #4facfe, #00f2fe)',
+                warning: 'linear-gradient(to right, #f093fb, #f5576c)'
+            };
+
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: bgColors[type] || bgColors.success,
+                },
+                stopOnFocus: true,
+            }).showToast();
+        }
+
         var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
 
         connection.start().then(function () {
-            console.log("Connected to NotificationHub (delete)");
+            console.log("[SignalR] Connected to NotificationHub (delete page)");
+            showToast("Connected to real-time updates", "info");
         }).catch(function (err) {
+            console.error("[SignalR] Connection failed:", err.toString());
+            showToast("Failed to connect to real-time updates", "error");
             return console.error(err.toString());
         });
 
         const btnHubDelete = document.getElementById("btnHubDelete");
         btnHubDelete?.addEventListener("click", function (event) {
             event.preventDefault();
-            var dataObj = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value;
+            const ticketCode = document.querySelector('dl dd')?.textContent || 'Unknown';
+            const id = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value;
 
-            connection.invoke("HubDelete", dataObj).catch(function (err) {
-                return console.error(err.toString());
-            });
+            showToast("Sending ticket deletion request...", "info");
+            
+            connection.invoke("HubDelete", id)
+                .then(function() {
+                    console.log("[SignalR] HubDelete invoked successfully");
+                    showToast("Ticket deletion request sent! Redirecting...", "success");
+                    
+                    // Redirect after 2 seconds
+                    setTimeout(function() {
+                        window.location.href = '/TicketProcessingVietNs';
+                    }, 2000);
+                })
+                .catch(function (err) {
+                    console.error("[SignalR] Error:", err.toString());
+                    showToast("Failed to delete ticket: " + err.toString(), "error");
+                });
         });
     </script>
 }

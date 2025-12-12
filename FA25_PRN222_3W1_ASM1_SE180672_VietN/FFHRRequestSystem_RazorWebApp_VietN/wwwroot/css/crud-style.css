@@ -880,3 +880,25 @@ textarea.form-control {
     margin-top: 5px;
     display: block;
 }
+
+/* Info Display Styles (for Details/Delete pages) */
+.info-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.info-value {
+    font-size: 14px;
+    color: var(--text-dark);
+    padding: 10px 0;
+    word-break: break-word;
+}

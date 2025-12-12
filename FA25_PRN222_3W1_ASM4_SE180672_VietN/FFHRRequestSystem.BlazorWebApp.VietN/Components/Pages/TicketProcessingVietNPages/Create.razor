@@ -128,8 +128,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="processedby" class="form-label fw-bold">Processed By</label>
-                                    <InputText id="processedby" @bind-Value="TicketProcessingVietN.ProcessedBy" class="form-control" />
+                                    <label for="processedby" class="form-label fw-bold">Processed By <span class="text-danger">*</span></label>
+                                    <InputText id="processedby" @bind-Value="TicketProcessingVietN.ProcessedBy" class="form-control" readonly />
                                     <ValidationMessage For="() => TicketProcessingVietN.ProcessedBy" class="text-danger" />
                                 </div>
                             </div>
@@ -184,6 +184,9 @@
     {
         var types = await _typeService.GetAllAsync();
         ProcessingTypeVietNs = types.AsQueryable();
+        
+        // Auto-fill ProcessedBy with VietN
+        TicketProcessingVietN.ProcessedBy = "VietN";
     }
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.

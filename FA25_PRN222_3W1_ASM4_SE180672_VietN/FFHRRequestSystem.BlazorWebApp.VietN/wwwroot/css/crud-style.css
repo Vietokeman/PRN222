@@ -350,6 +350,51 @@ nav {
     color: var(--text-gray);
 }
 
+/* Info Display Styles (for Details/Delete pages) */
+.info-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.info-value {
+    font-size: 14px;
+    color: var(--text-dark);
+    padding: 10px 0;
+    word-break: break-word;
+}
+
+/* Button Danger Style */
+.btn-danger {
+    padding: 12px 24px;
+    background-color: #D32F2F;
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(211, 47, 47, 0.3);
+}
+
+.btn-danger:hover {
+    background-color: #B71C1C;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+}
+
 @media (max-width: 768px) {
     .sidebar {
         transform: translateX(-100%) !important;

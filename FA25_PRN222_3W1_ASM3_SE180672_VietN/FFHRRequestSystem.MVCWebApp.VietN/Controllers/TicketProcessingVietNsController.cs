@@ -28,7 +28,7 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
         }
 
         // GET: TicketProcessingVietNs
-        public async Task<IActionResult> Index(string processingAction, string actionDescription, string typeName)
+        public async Task<IActionResult> Index(string processingAction, string actionDescription, string typeName, int currentPage = 1, int pageSize = 10)
         {
             List<TicketProcessingVietN> items;
             
@@ -45,7 +45,30 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
             ViewData["ActionDescription"] = actionDescription;
             ViewData["TypeName"] = typeName;
 
-            return View(items);
+            // Pagination logic
+            int totalItems = items.Count;
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+            int fromEntry = totalItems == 0 ? 0 : (currentPage - 1) * pageSize + 1;
+            int toEntry = Math.Min(currentPage * pageSize, totalItems);
+
+            var pagedItems = items
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewData["CurrentPage"] = currentPage;
+            ViewData["PageSize"] = pageSize;
+            ViewData["TotalItems"] = totalItems;
+            ViewData["TotalPages"] = totalPages;
+            ViewData["FromEntry"] = fromEntry;
+            ViewData["ToEntry"] = toEntry;
+            ViewData["PageSizeOptions"] = new[] { 5, 10, 25, 50, 100 };
+
+            return View(pagedItems);
         }
 
         // GET: TicketProcessingVietNs/Details/5
@@ -108,58 +131,61 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
             return View(ticketProcessingVietN);
         }
 
-        //// GET: TicketProcessingVietNs/Edit/5
-        //public async Task<IActionResult> Edit(Guid? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // GET: TicketProcessingVietNs/Edit/5
+        public async Task<IActionResult> Edit(Guid? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var ticketProcessingVietN = await _context.TicketProcessingVietNs.FindAsync(id);
-        //    if (ticketProcessingVietN == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    ViewData["ProcessingTypeVietNid"] = new SelectList(_context.ProcessingTypeVietNs, "ProcessingTypeVietNid", "TypeCode", ticketProcessingVietN.ProcessingTypeVietNid);
-        //    return View(ticketProcessingVietN);
-        //}
+            var ticketProcessingVietN = await _service.GetByIdAsync(id.Value);
+            if (ticketProcessingVietN == null)
+            {
+                return NotFound();
+            }
+            var listTypes = await _processingTypeService.GetAllAsync();
+            ViewData["ProcessingTypeVietNid"] = new SelectList(listTypes, "ProcessingTypeVietNid", "TypeName", ticketProcessingVietN.ProcessingTypeVietNid);
+            return View(ticketProcessingVietN);
+        }
 
-        //// POST: TicketProcessingVietNs/Edit/5
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(Guid id, [Bind("TicketProcessingVietNid,ProcessingCode,TicketReference,ProcessingTypeVietNid,ProcessingAction,ActionDescription,RelatedTicketCode,PriorityLevel,Status,OverdueDays,EscalationLevel,IsAutoProcessed,ProcessedBy,ProcessedDate,ResolvedNote,CreatedDate,ModifiedDate")] TicketProcessingVietN ticketProcessingVietN)
-        //{
-        //    if (id != ticketProcessingVietN.TicketProcessingVietNid)
-        //    {
-        //        return NotFound();
-        //    }
+        // POST: TicketProcessingVietNs/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Guid id, [Bind("TicketProcessingVietNid,ProcessingCode,TicketReference,ProcessingTypeVietNid,ProcessingAction,ActionDescription,RelatedTicketCode,PriorityLevel,Status,OverdueDays,EscalationLevel,IsAutoProcessed,ProcessedBy,ProcessedDate,ResolvedNote,CreatedDate,ModifiedDate")] TicketProcessingVietN ticketProcessingVietN)
+        {
+            if (id != ticketProcessingVietN.TicketProcessingVietNid)
+            {
+                return NotFound();
+            }
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(ticketProcessingVietN);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!TicketProcessingVietNExists(ticketProcessingVietN.TicketProcessingVietNid))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["ProcessingTypeVietNid"] = new SelectList(_context.ProcessingTypeVietNs, "ProcessingTypeVietNid", "TypeCode", ticketProcessingVietN.ProcessingTypeVietNid);
-        //    return View(ticketProcessingVietN);
-        //}
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    ticketProcessingVietN.ModifiedDate = DateTime.Now;
+                    var result = await _service.UpdateAsync(ticketProcessingVietN);
+                    if (result > 0)
+                    {
+                        TempData["SuccessMessage"] = $"Ticket '{ticketProcessingVietN.ProcessingCode}' updated successfully!";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "Failed to update ticket. Please try again.";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+                }
+            }
+            var listTypes = await _processingTypeService.GetAllAsync();
+            ViewData["ProcessingTypeVietNid"] = new SelectList(listTypes, "ProcessingTypeVietNid", "TypeName", ticketProcessingVietN.ProcessingTypeVietNid);
+            return View(ticketProcessingVietN);
+        }
 
         // GET: TicketProcessingVietNs/Delete/5
         public async Task<IActionResult> Delete(Guid id)

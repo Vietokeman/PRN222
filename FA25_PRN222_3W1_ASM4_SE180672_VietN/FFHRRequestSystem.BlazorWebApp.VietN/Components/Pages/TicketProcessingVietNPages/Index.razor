@@ -17,6 +17,55 @@
     </div>
 </div>
 
+<!-- Search Filters -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header" style="background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%); color: white;">
+        <h5 class="mb-0"><i class="bi bi-funnel"></i> Search Filters</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Processing Action</label>
+                <input type="text" 
+                       placeholder="Enter processing action..." 
+                       class="form-control" 
+                       @bind="searchProcessingAction" 
+                       @bind:event="oninput" />
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Action Description</label>
+                <input type="text" 
+                       placeholder="Enter action description..." 
+                       class="form-control" 
+                       @bind="searchActionDescription" 
+                       @bind:event="oninput" />
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Type Name</label>
+                <input type="text" 
+                       placeholder="Enter type name..." 
+                       class="form-control" 
+                       @bind="searchTypeName" 
+                       @bind:event="oninput" />
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-12 d-flex gap-2 justify-content-end">
+                <button class="btn btn-secondary" @onclick="ResetSearch">
+                    <i class="bi bi-x-circle"></i> Clear
+                </button>
+                
+                <button class="btn btn-primary" @onclick="PerformSearch">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Data Table -->
 <div class="card shadow-sm">
     <div class="card-header" style="background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%); color: white;">
@@ -205,6 +254,10 @@
     private int totalItems = 0;
     private int[] PageSizeOptions = new[] { 5, 10, 25, 50, 100 };
 
+    private string searchProcessingAction = "";
+    private string searchActionDescription = "";
+    private string searchTypeName = "";
+
     private int TotalPages => (int)Math.Ceiling((double)totalItems / pageSize);
     private int FromEntry => totalItems == 0 ? 0 : (currentPage - 1) * pageSize + 1;
     private int ToEntry => Math.Min(currentPage * pageSize, totalItems);
@@ -219,6 +272,23 @@
         allTickets = await _ticketService.GetAllAsync();
         totalItems = allTickets.Count;
         UpdatePagedTickets();
+    }
+
+    private async Task PerformSearch()
+    {
+        allTickets = await _ticketService.SearchAsync(searchProcessingAction, searchActionDescription, searchTypeName);
+        currentPage = 1;
+        totalItems = allTickets.Count;
+        UpdatePagedTickets();
+    }
+
+    private async Task ResetSearch()
+    {
+        searchProcessingAction = "";
+        searchActionDescription = "";
+        searchTypeName = "";
+        currentPage = 1;
+        await LoadData();
     }
 
     private void UpdatePagedTickets()

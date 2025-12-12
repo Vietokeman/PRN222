@@ -1,114 +1,129 @@
 ﻿@model FFHRRequestSystem.Entitites.VietN.Models.TicketProcessingVietN
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Ticket Details";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>TicketProcessingVietN</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProcessingCode)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProcessingCode)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketReference)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TicketReference)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProcessingAction)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProcessingAction)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ActionDescription)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ActionDescription)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RelatedTicketCode)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RelatedTicketCode)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PriorityLevel)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PriorityLevel)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OverdueDays)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OverdueDays)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EscalationLevel)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EscalationLevel)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsAutoProcessed)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsAutoProcessed)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProcessedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProcessedBy)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProcessedDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProcessedDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ResolvedNote)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ResolvedNote)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ModifiedDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ModifiedDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProcessingTypeVietN)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProcessingTypeVietN.TypeCode)
-        </dd>
-    </dl>
+<div class="content-header">
+    <h1><i class="bi bi-eye"></i> Ticket Details</h1>
+    <div class="header-actions">
+        <a asp-action="Index" class="btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.TicketProcessingVietNid">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="form-container">
+    <!-- Basic Information Section -->
+    <div class="form-section">
+        <h3 class="form-section-title">Basic Information</h3>
+        <div class="form-row">
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.ProcessingCode)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.ProcessingCode)</div>
+            </div>
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.TicketReference)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.TicketReference)</div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.ProcessingTypeVietN)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.ProcessingTypeVietN.TypeCode)</div>
+            </div>
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.RelatedTicketCode)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.RelatedTicketCode)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Details Section -->
+    <div class="form-section">
+        <h3 class="form-section-title">Processing Details</h3>
+        <div class="form-row">
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.ProcessingAction)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.ProcessingAction)</div>
+            </div>
+            <div class="info-group" style="grid-column: 2 / -1;">
+                <label>@Html.DisplayNameFor(model => model.ActionDescription)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.ActionDescription)</div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.PriorityLevel)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.PriorityLevel)</div>
+            </div>
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.Status)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.Status)</div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.OverdueDays)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.OverdueDays)</div>
+            </div>
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.EscalationLevel)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.EscalationLevel)</div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.IsAutoProcessed)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.IsAutoProcessed)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolution Details Section -->
+    <div class="form-section">
+        <h3 class="form-section-title">Resolution Details</h3>
+        <div class="form-row">
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.ProcessedBy)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.ProcessedBy)</div>
+            </div>
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.ProcessedDate)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.ProcessedDate)</div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="info-group" style="grid-column: 1 / -1;">
+                <label>@Html.DisplayNameFor(model => model.ResolvedNote)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.ResolvedNote)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Information Section -->
+    <div class="form-section">
+        <h3 class="form-section-title">System Information</h3>
+        <div class="form-row">
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.CreatedDate)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.CreatedDate)</div>
+            </div>
+            <div class="info-group">
+                <label>@Html.DisplayNameFor(model => model.ModifiedDate)</label>
+                <div class="info-value">@Html.DisplayFor(model => model.ModifiedDate)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+        <a asp-action="Index" class="btn-secondary">
+            <i class="bi bi-x-circle"></i> Back to List
+        </a>
+        <a asp-action="Edit" asp-route-id="@Model?.TicketProcessingVietNid" class="btn-primary">
+            <i class="bi bi-pencil"></i> Edit Ticket
+        </a>
+    </div>
 </div>
