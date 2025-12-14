@@ -56,20 +56,260 @@
         <table id="ticketProcessingTable" class="data-table">
             <thead>
                 <tr>
-                    <th>Code</th>
-                    <th>Ticket Ref</th>
-                    <th>Action</th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="ProcessingCode" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "ProcessingCode" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Code
+                            @if (ViewData["SortColumn"]?.ToString() == "ProcessingCode")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="TicketReference" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "TicketReference" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Ticket Ref
+                            @if (ViewData["SortColumn"]?.ToString() == "TicketReference")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="ProcessingAction" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "ProcessingAction" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Action
+                            @if (ViewData["SortColumn"]?.ToString() == "ProcessingAction")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
                     <th>Description</th>
-                    <th>Priority</th>
-                    <th>Status</th>
-                    <th>Overdue</th>
-                    <th>Escalation</th>
-                    <th>Auto</th>
-                    <th>Processed By</th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="PriorityLevel" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "PriorityLevel" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Priority
+                            @if (ViewData["SortColumn"]?.ToString() == "PriorityLevel")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="Status" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "Status" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Status
+                            @if (ViewData["SortColumn"]?.ToString() == "Status")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="OverdueDays" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "OverdueDays" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Overdue
+                            @if (ViewData["SortColumn"]?.ToString() == "OverdueDays")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="EscalationLevel" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "EscalationLevel" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Escalation
+                            @if (ViewData["SortColumn"]?.ToString() == "EscalationLevel")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="IsAutoProcessed" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "IsAutoProcessed" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Auto
+                            @if (ViewData["SortColumn"]?.ToString() == "IsAutoProcessed")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="ProcessedBy" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "ProcessedBy" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Processed By
+                            @if (ViewData["SortColumn"]?.ToString() == "ProcessedBy")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
                     <th>Resolved Note</th>
-                    <th>Created</th>
-                    <th>Modified</th>
-                    <th>Type</th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="CreatedDate" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "CreatedDate" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Created
+                            @if (ViewData["SortColumn"]?.ToString() == "CreatedDate")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="ModifiedDate" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "ModifiedDate" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Modified
+                            @if (ViewData["SortColumn"]?.ToString() == "ModifiedDate")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-sortColumn="TypeName" 
+                           asp-route-sortDirection="@(ViewData["SortColumn"]?.ToString() == "TypeName" && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc")"
+                           asp-route-processingAction="@ViewData["ProcessingAction"]"
+                           asp-route-actionDescription="@ViewData["ActionDescription"]"
+                           asp-route-typeName="@ViewData["TypeName"]"
+                           asp-route-pageSize="@ViewData["PageSize"]"
+                           asp-route-currentPage="@ViewData["CurrentPage"]"
+                           style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                            Type
+                            @if (ViewData["SortColumn"]?.ToString() == "TypeName")
+                            {
+                                <i class="bi bi-caret-@(ViewData["SortDirection"]?.ToString() == "asc" ? "up" : "down")-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                            }
+                        </a>
+                    </th>
                     <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>
@@ -197,7 +437,7 @@
                         }
                         else
                         {
-                            <a asp-action="Index" asp-route-currentpage="1" asp-route-pagesize="@ViewData["PageSize"]" asp-route-processingAction="@ViewData["ProcessingAction"]" asp-route-actionDescription="@ViewData["ActionDescription"]" asp-route-typeName="@ViewData["TypeName"]" 
+                            <a asp-action="Index" asp-route-currentpage="1" asp-route-pagesize="@ViewData["PageSize"]" asp-route-processingAction="@ViewData["ProcessingAction"]" asp-route-actionDescription="@ViewData["ActionDescription"]" asp-route-typeName="@ViewData["TypeName"]" asp-route-sortColumn="@ViewData["SortColumn"]" asp-route-sortDirection="@ViewData["SortDirection"]"
                                class="pagination-link"><i class="bi bi-chevron-double-left"></i></a>
                         }
                     </li>
@@ -210,7 +450,7 @@
                         }
                         else
                         {
-                            <a asp-action="Index" asp-route-currentpage="@((int)ViewData["CurrentPage"] - 1)" asp-route-pagesize="@ViewData["PageSize"]" asp-route-processingAction="@ViewData["ProcessingAction"]" asp-route-actionDescription="@ViewData["ActionDescription"]" asp-route-typeName="@ViewData["TypeName"]" 
+                            <a asp-action="Index" asp-route-currentpage="@((int)ViewData["CurrentPage"] - 1)" asp-route-pagesize="@ViewData["PageSize"]" asp-route-processingAction="@ViewData["ProcessingAction"]" asp-route-actionDescription="@ViewData["ActionDescription"]" asp-route-typeName="@ViewData["TypeName"]" asp-route-sortColumn="@ViewData["SortColumn"]" asp-route-sortDirection="@ViewData["SortDirection"]"
                                class="pagination-link"><i class="bi bi-chevron-left"></i></a>
                         }
                     </li>
@@ -239,7 +479,7 @@
                                 }
                                 else
                                 {
-                                    <a asp-action="Index" asp-route-currentpage="@i" asp-route-pagesize="@ViewData["PageSize"]" asp-route-processingAction="@ViewData["ProcessingAction"]" asp-route-actionDescription="@ViewData["ActionDescription"]" asp-route-typeName="@ViewData["TypeName"]" 
+                                    <a asp-action="Index" asp-route-currentpage="@i" asp-route-pagesize="@ViewData["PageSize"]" asp-route-processingAction="@ViewData["ProcessingAction"]" asp-route-actionDescription="@ViewData["ActionDescription"]" asp-route-typeName="@ViewData["TypeName"]" asp-route-sortColumn="@ViewData["SortColumn"]" asp-route-sortDirection="@ViewData["SortDirection"]"
                                        class="pagination-link">@i</a>
                                 }
                             </li>
@@ -254,7 +494,7 @@
                         }
                         else
                         {
-                            <a asp-action="Index" asp-route-currentpage="@((int)ViewData["CurrentPage"] + 1)" asp-route-pagesize="@ViewData["PageSize"]" asp-route-processingAction="@ViewData["ProcessingAction"]" asp-route-actionDescription="@ViewData["ActionDescription"]" asp-route-typeName="@ViewData["TypeName"]" 
+                            <a asp-action="Index" asp-route-currentpage="@((int)ViewData["CurrentPage"] + 1)" asp-route-pagesize="@ViewData["PageSize"]" asp-route-processingAction="@ViewData["ProcessingAction"]" asp-route-actionDescription="@ViewData["ActionDescription"]" asp-route-typeName="@ViewData["TypeName"]" asp-route-sortColumn="@ViewData["SortColumn"]" asp-route-sortDirection="@ViewData["SortDirection"]"
                                class="pagination-link"><i class="bi bi-chevron-right"></i></a>
                         }
                     </li>
@@ -267,7 +507,7 @@
                         }
                         else
                         {
-                            <a asp-action="Index" asp-route-currentpage="@ViewData["TotalPages"]" asp-route-pagesize="@ViewData["PageSize"]" asp-route-processingAction="@ViewData["ProcessingAction"]" asp-route-actionDescription="@ViewData["ActionDescription"]" asp-route-typeName="@ViewData["TypeName"]" 
+                            <a asp-action="Index" asp-route-currentpage="@ViewData["TotalPages"]" asp-route-pagesize="@ViewData["PageSize"]" asp-route-processingAction="@ViewData["ProcessingAction"]" asp-route-actionDescription="@ViewData["ActionDescription"]" asp-route-typeName="@ViewData["TypeName"]" asp-route-sortColumn="@ViewData["SortColumn"]" asp-route-sortDirection="@ViewData["SortDirection"]"
                                class="pagination-link"><i class="bi bi-chevron-double-right"></i></a>
                         }
                     </li>

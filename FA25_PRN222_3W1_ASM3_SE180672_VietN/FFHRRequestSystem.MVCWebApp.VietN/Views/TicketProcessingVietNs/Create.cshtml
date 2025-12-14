@@ -24,8 +24,9 @@
             <div class="form-row">
                 <div class="form-group">
                     <label asp-for="ProcessingCode">Processing Code <span class="text-danger">*</span></label>
-                    <input asp-for="ProcessingCode" class="form-control" placeholder="Enter processing code" required />
+                    <input asp-for="ProcessingCode" class="form-control" pattern="PROC-\d{4}-\d{4}" title="Format: PROC-xxxx-xxxx (e.g., PROC-2024-0003)" placeholder="PROC-2024-0003" required />
                     <span asp-validation-for="ProcessingCode" class="text-danger"></span>
+                    <small class="form-text text-muted">Format: PROC-xxxx-xxxx (e.g., PROC-2024-0003)</small>
                 </div>
                 <div class="form-group">
                     <label asp-for="TicketReference">Ticket Reference <span class="text-danger">*</span></label>

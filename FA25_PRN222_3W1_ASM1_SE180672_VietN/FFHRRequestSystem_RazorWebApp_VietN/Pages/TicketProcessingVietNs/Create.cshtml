@@ -31,8 +31,9 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label asp-for="TicketProcessingVietN.ProcessingCode" class="form-label fw-bold">Processing Code <span class="text-danger">*</span></label>
-                                <input asp-for="TicketProcessingVietN.ProcessingCode" class="form-control" required />
+                                <input asp-for="TicketProcessingVietN.ProcessingCode" class="form-control" pattern="PROC-\d{4}-\d{4}" title="Format: PROC-xxxx-xxxx (e.g., PROC-2024-0003)" placeholder="PROC-2024-0003" required />
                                 <span asp-validation-for="TicketProcessingVietN.ProcessingCode" class="text-danger"></span>
+                                <small class="form-text text-muted">Format: PROC-xxxx-xxxx (e.g., PROC-2024-0003)</small>
                             </div>
                             <div class="col-md-6">
                                 <label asp-for="TicketProcessingVietN.TicketReference" class="form-label fw-bold">Ticket Reference <span class="text-danger">*</span></label>

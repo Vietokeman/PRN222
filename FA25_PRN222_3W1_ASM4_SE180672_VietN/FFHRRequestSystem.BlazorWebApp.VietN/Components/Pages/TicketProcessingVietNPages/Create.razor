@@ -44,8 +44,9 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label for="processingcode" class="form-label fw-bold">Processing Code <span class="text-danger">*</span></label>
-                                    <InputText id="processingcode" @bind-Value="TicketProcessingVietN.ProcessingCode" class="form-control" required />
+                                    <InputText id="processingcode" @bind-Value="TicketProcessingVietN.ProcessingCode" class="form-control" pattern="PROC-\d{4}-\d{4}" title="Format: PROC-xxxx-xxxx (e.g., PROC-2024-0003)" placeholder="PROC-2024-0003" required />
                                     <ValidationMessage For="() => TicketProcessingVietN.ProcessingCode" class="text-danger" />
+                                    <small class="form-text text-muted">Format: PROC-xxxx-xxxx (e.g., PROC-2024-0003)</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="ticketreference" class="form-label fw-bold">Ticket Reference <span class="text-danger">*</span></label>

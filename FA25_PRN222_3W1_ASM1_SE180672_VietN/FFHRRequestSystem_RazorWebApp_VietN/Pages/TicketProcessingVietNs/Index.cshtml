@@ -8,17 +8,45 @@
 <div class="content-header">
     <h1><i class="bi bi-ticket-perforated"></i> Tickets Management</h1>
     <div class="header-actions">
-        <div class="search-box">
-            <input type="text" id="quickSearch" placeholder="Search..." />
-            <i class="bi bi-search"></i>
-        </div>
-        <button class="notification-btn">
-            <i class="bi bi-bell"></i>
-            <span class="notification-badge">3</span>
-        </button>
         <a asp-page="./Create" class="btn-add-new">
             <i class="bi bi-plus-circle"></i> ADD NEW TICKET
         </a>
+    </div>
+</div>
+
+<!-- Search Filters -->
+<div class="data-table-container" style="margin-bottom: 20px;">
+    <div class="table-header">
+        <h2>Search Filters</h2>
+    </div>
+    <div style="padding: 20px;">
+        <form method="get" asp-page="./Index">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Processing Action</label>
+                    <input type="text" name="processingAction" class="form-control" value="@Model.ProcessingAction" placeholder="Enter processing action" />
+                </div>
+                <div class="form-group">
+                    <label>Action Description</label>
+                    <input type="text" name="actionDescription" class="form-control" value="@Model.ActionDescription" placeholder="Enter action description" />
+                </div>
+                <div class="form-group">
+                    <label>Type Name</label>
+                    <input type="text" name="typeName" class="form-control" value="@Model.TypeName" placeholder="Enter type name" />
+                </div>
+            </div>
+            <input type="hidden" name="sortColumn" value="@Model.SortColumn" />
+            <input type="hidden" name="sortDirection" value="@Model.SortDirection" />
+            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+            <div class="form-actions" style="margin-top: 0; padding-top: 0; border: none;">
+                <a asp-page="./Index" class="btn-secondary">
+                    <i class="bi bi-x-circle"></i> Clear
+                </a>
+                <button type="submit" class="btn-primary">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -31,20 +59,260 @@
             <table id="ticketProcessingTable" class="data-table">
                 <thead>
                     <tr>
-                        <th>Code</th>
-                        <th>Ticket Ref</th>
-                        <th>Action</th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="ProcessingCode" 
+                               asp-route-sortDirection="@(Model.SortColumn == "ProcessingCode" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Code
+                                @if (Model.SortColumn == "ProcessingCode")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="TicketReference" 
+                               asp-route-sortDirection="@(Model.SortColumn == "TicketReference" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Ticket Ref
+                                @if (Model.SortColumn == "TicketReference")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="ProcessingAction" 
+                               asp-route-sortDirection="@(Model.SortColumn == "ProcessingAction" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Action
+                                @if (Model.SortColumn == "ProcessingAction")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
                         <th>Description</th>
-                        <th>Priority</th>
-                        <th>Status</th>
-                        <th>Overdue</th>
-                        <th>Escalation</th>
-                        <th>Auto</th>
-                        <th>Processed By</th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="PriorityLevel" 
+                               asp-route-sortDirection="@(Model.SortColumn == "PriorityLevel" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Priority
+                                @if (Model.SortColumn == "PriorityLevel")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="Status" 
+                               asp-route-sortDirection="@(Model.SortColumn == "Status" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Status
+                                @if (Model.SortColumn == "Status")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="OverdueDays" 
+                               asp-route-sortDirection="@(Model.SortColumn == "OverdueDays" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Overdue
+                                @if (Model.SortColumn == "OverdueDays")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="EscalationLevel" 
+                               asp-route-sortDirection="@(Model.SortColumn == "EscalationLevel" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Escalation
+                                @if (Model.SortColumn == "EscalationLevel")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="IsAutoProcessed" 
+                               asp-route-sortDirection="@(Model.SortColumn == "IsAutoProcessed" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Auto
+                                @if (Model.SortColumn == "IsAutoProcessed")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="ProcessedBy" 
+                               asp-route-sortDirection="@(Model.SortColumn == "ProcessedBy" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Processed By
+                                @if (Model.SortColumn == "ProcessedBy")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
                         <th>Resolved Note</th>
-                        <th>Created</th>
-                        <th>Modified</th>
-                        <th>Type Name</th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="CreatedDate" 
+                               asp-route-sortDirection="@(Model.SortColumn == "CreatedDate" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Created
+                                @if (Model.SortColumn == "CreatedDate")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="ModifiedDate" 
+                               asp-route-sortDirection="@(Model.SortColumn == "ModifiedDate" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Modified
+                                @if (Model.SortColumn == "ModifiedDate")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index" 
+                               asp-route-sortColumn="TypeName" 
+                               asp-route-sortDirection="@(Model.SortColumn == "TypeName" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                               asp-route-processingAction="@Model.ProcessingAction"
+                               asp-route-actionDescription="@Model.ActionDescription"
+                               asp-route-typeName="@Model.TypeName"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-currentPage="@Model.CurrentPage"
+                               style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Type Name
+                                @if (Model.SortColumn == "TypeName")
+                                {
+                                    <i class="bi bi-caret-@(Model.SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
                         <th style="text-align: center;">Actions</th>
                     </tr>
                 </thead>
@@ -172,7 +440,7 @@
                             }
                             else
                             {
-                                <a asp-page="./Index" asp-route-currentpage="1" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" 
+                                <a asp-page="./Index" asp-route-currentpage="1" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" asp-route-sortColumn="@Model.SortColumn" asp-route-sortDirection="@Model.SortDirection"
                                    class="pagination-link"><i class="bi bi-chevron-double-left"></i></a>
                             }
                         </li>
@@ -185,7 +453,7 @@
                             }
                             else
                             {
-                                <a asp-page="./Index" asp-route-currentpage="@(Model.CurrentPage - 1)" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" 
+                                <a asp-page="./Index" asp-route-currentpage="@(Model.CurrentPage - 1)" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" asp-route-sortColumn="@Model.SortColumn" asp-route-sortDirection="@Model.SortDirection"
                                    class="pagination-link"><i class="bi bi-chevron-left"></i></a>
                             }
                         </li>
@@ -200,7 +468,7 @@
                                 }
                                 else
                                 {
-                                    <a asp-page="./Index" asp-route-currentpage="@pageNum" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" 
+                                    <a asp-page="./Index" asp-route-currentpage="@pageNum" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" asp-route-sortColumn="@Model.SortColumn" asp-route-sortDirection="@Model.SortDirection"
                                        class="pagination-link">@pageNum</a>
                                 }
                             </li>
@@ -214,7 +482,7 @@
                             }
                             else
                             {
-                                <a asp-page="./Index" asp-route-currentpage="@(Model.CurrentPage + 1)" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" 
+                                <a asp-page="./Index" asp-route-currentpage="@(Model.CurrentPage + 1)" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" asp-route-sortColumn="@Model.SortColumn" asp-route-sortDirection="@Model.SortDirection"
                                    class="pagination-link"><i class="bi bi-chevron-right"></i></a>
                             }
                         </li>
@@ -227,7 +495,7 @@
                             }
                             else
                             {
-                                <a asp-page="./Index" asp-route-currentpage="@Model.TotalPages" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" 
+                                <a asp-page="./Index" asp-route-currentpage="@Model.TotalPages" asp-route-pagesize="@Model.PageSize" asp-route-processingAction="@Model.ProcessingAction" asp-route-actionDescription="@Model.ActionDescription" asp-route-typeName="@Model.TypeName" asp-route-sortColumn="@Model.SortColumn" asp-route-sortDirection="@Model.SortDirection"
                                    class="pagination-link"><i class="bi bi-chevron-double-right"></i></a>
                             }
                         </li>
@@ -385,7 +653,6 @@ function changePage(select) {
                 showToast("Ticket deleted successfully via SignalR!", "warning");
             }
         });
-    </script>
 
         // Show TempData messages
         $(document).ready(function() {

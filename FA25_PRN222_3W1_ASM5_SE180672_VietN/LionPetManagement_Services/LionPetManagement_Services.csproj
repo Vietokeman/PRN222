@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LionPetManagement_Repositories\LionPetManagement_Repositories.csproj" />
+  </ItemGroup>
+
 </Project>

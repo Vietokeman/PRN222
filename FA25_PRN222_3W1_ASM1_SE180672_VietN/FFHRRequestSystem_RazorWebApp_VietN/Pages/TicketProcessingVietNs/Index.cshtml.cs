@@ -37,6 +37,12 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
         [BindProperty(SupportsGet = true)]
         public int PageSize { get; set; } = 10;
 
+        [BindProperty(SupportsGet = true)]
+        public string SortColumn { get; set; } = "CreatedDate";
+
+        [BindProperty(SupportsGet = true)]
+        public string SortDirection { get; set; } = "desc";
+
         public int TotalItems { get; set; }
         public int TotalPages { get; set; }
         public int FromEntry { get; set; }
@@ -54,6 +60,9 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
                 TicketProcessingVietN = await _service.GetAllAsync();
             }
 
+            // Apply sorting
+            TicketProcessingVietN = ApplySorting(TicketProcessingVietN);
+
             // Pagination logic
             TotalItems = TicketProcessingVietN.Count;
             TotalPages = (int)Math.Ceiling((double)TotalItems / PageSize);
@@ -68,6 +77,34 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
                 .Skip((CurrentPage - 1) * PageSize)
                 .Take(PageSize)
                 .ToList();
+        }
+
+        private IList<TicketProcessingVietN> ApplySorting(IList<TicketProcessingVietN> items)
+        {
+            if (string.IsNullOrEmpty(SortColumn))
+                return items;
+
+            var query = items.AsQueryable();
+            var isAscending = SortDirection?.ToLower() == "asc";
+
+            query = SortColumn switch
+            {
+                "ProcessingCode" => isAscending ? query.OrderBy(x => x.ProcessingCode) : query.OrderByDescending(x => x.ProcessingCode),
+                "TicketReference" => isAscending ? query.OrderBy(x => x.TicketReference) : query.OrderByDescending(x => x.TicketReference),
+                "ProcessingAction" => isAscending ? query.OrderBy(x => x.ProcessingAction) : query.OrderByDescending(x => x.ProcessingAction),
+                "PriorityLevel" => isAscending ? query.OrderBy(x => x.PriorityLevel) : query.OrderByDescending(x => x.PriorityLevel),
+                "Status" => isAscending ? query.OrderBy(x => x.Status) : query.OrderByDescending(x => x.Status),
+                "OverdueDays" => isAscending ? query.OrderBy(x => x.OverdueDays) : query.OrderByDescending(x => x.OverdueDays),
+                "EscalationLevel" => isAscending ? query.OrderBy(x => x.EscalationLevel) : query.OrderByDescending(x => x.EscalationLevel),
+                "IsAutoProcessed" => isAscending ? query.OrderBy(x => x.IsAutoProcessed) : query.OrderByDescending(x => x.IsAutoProcessed),
+                "ProcessedBy" => isAscending ? query.OrderBy(x => x.ProcessedBy) : query.OrderByDescending(x => x.ProcessedBy),
+                "CreatedDate" => isAscending ? query.OrderBy(x => x.CreatedDate) : query.OrderByDescending(x => x.CreatedDate),
+                "ModifiedDate" => isAscending ? query.OrderBy(x => x.ModifiedDate) : query.OrderByDescending(x => x.ModifiedDate),
+                "TypeName" => isAscending ? query.OrderBy(x => x.ProcessingTypeVietN.TypeName) : query.OrderByDescending(x => x.ProcessingTypeVietN.TypeName),
+                _ => query.OrderByDescending(x => x.CreatedDate)
+            };
+
+            return query.ToList();
         }
 
         public List<int> GetPageNumbers()

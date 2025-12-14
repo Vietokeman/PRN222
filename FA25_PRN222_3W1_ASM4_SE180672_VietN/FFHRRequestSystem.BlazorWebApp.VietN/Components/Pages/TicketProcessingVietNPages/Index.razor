@@ -76,17 +76,137 @@
             <table class="table table-hover mb-0" style="font-size: 14px;">
                 <thead style="background-color: #f8f9fa; position: sticky; top: 0; z-index: 10;">
                     <tr>
-                        <th style="padding: 15px 10px; font-weight: 600;">Code</th>
-                        <th style="padding: 15px 10px; font-weight: 600;">Ticket Ref</th>
-                        <th style="padding: 15px 10px; font-weight: 600;">Type</th>
-                        <th style="padding: 15px 10px; font-weight: 600;">Action</th>
+                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("ProcessingCode")'>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                Code
+                                @if (sortColumn == "ProcessingCode")
+                                {
+                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </div>
+                        </th>
+                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("TicketReference")'>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                Ticket Ref
+                                @if (sortColumn == "TicketReference")
+                                {
+                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </div>
+                        </th>
+                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("TypeName")'>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                Type
+                                @if (sortColumn == "TypeName")
+                                {
+                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </div>
+                        </th>
+                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("ProcessingAction")'>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                Action
+                                @if (sortColumn == "ProcessingAction")
+                                {
+                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </div>
+                        </th>
                         <th style="padding: 15px 10px; font-weight: 600;">Description</th>
-                        <th style="padding: 15px 10px; font-weight: 600;">Priority</th>
-                        <th style="padding: 15px 10px; font-weight: 600;">Status</th>
-                        <th style="padding: 15px 10px; font-weight: 600;">Overdue</th>
-                        <th style="padding: 15px 10px; font-weight: 600;">Auto</th>
-                        <th style="padding: 15px 10px; font-weight: 600;">Processed By</th>
-                        <th style="padding: 15px 10px; font-weight: 600;">Created</th>
+                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("PriorityLevel")'>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                Priority
+                                @if (sortColumn == "PriorityLevel")
+                                {
+                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </div>
+                        </th>
+                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("Status")'>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                Status
+                                @if (sortColumn == "Status")
+                                {
+                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </div>
+                        </th>
+                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("OverdueDays")'>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                Overdue
+                                @if (sortColumn == "OverdueDays")
+                                {
+                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </div>
+                        </th>
+                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("IsAutoProcessed")'>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                Auto
+                                @if (sortColumn == "IsAutoProcessed")
+                                {
+                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </div>
+                        </th>
+                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("ProcessedBy")'>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                Processed By
+                                @if (sortColumn == "ProcessedBy")
+                                {
+                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </div>
+                        </th>
+                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("CreatedDate")'>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                Created
+                                @if (sortColumn == "CreatedDate")
+                                {
+                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </div>
+                        </th>
                         <th style="padding: 15px 10px; text-align: center; font-weight: 600;">Actions</th>
                     </tr>
                 </thead>
@@ -258,6 +378,9 @@
     private string searchActionDescription = "";
     private string searchTypeName = "";
 
+    private string sortColumn = "CreatedDate";
+    private string sortDirection = "desc";
+
     private int TotalPages => (int)Math.Ceiling((double)totalItems / pageSize);
     private int FromEntry => totalItems == 0 ? 0 : (currentPage - 1) * pageSize + 1;
     private int ToEntry => Math.Min(currentPage * pageSize, totalItems);
@@ -270,6 +393,7 @@
     private async Task LoadData()
     {
         allTickets = await _ticketService.GetAllAsync();
+        ApplySorting();
         totalItems = allTickets.Count;
         UpdatePagedTickets();
     }
@@ -278,6 +402,7 @@
     {
         allTickets = await _ticketService.SearchAsync(searchProcessingAction, searchActionDescription, searchTypeName);
         currentPage = 1;
+        ApplySorting();
         totalItems = allTickets.Count;
         UpdatePagedTickets();
     }
@@ -289,6 +414,67 @@
         searchTypeName = "";
         currentPage = 1;
         await LoadData();
+    }
+
+    private void SortColumn(string columnName)
+    {
+        if (sortColumn == columnName)
+        {
+            sortDirection = sortDirection == "asc" ? "desc" : "asc";
+        }
+        else
+        {
+            sortColumn = columnName;
+            sortDirection = "asc";
+        }
+        
+        currentPage = 1;
+        ApplySorting();
+        UpdatePagedTickets();
+        StateHasChanged();
+    }
+
+    private void ApplySorting()
+    {
+        if (string.IsNullOrEmpty(sortColumn))
+            return;
+
+        var isAscending = sortDirection == "asc";
+
+        allTickets = sortColumn switch
+        {
+            "ProcessingCode" => isAscending 
+                ? allTickets.OrderBy(x => x.ProcessingCode).ToList() 
+                : allTickets.OrderByDescending(x => x.ProcessingCode).ToList(),
+            "TicketReference" => isAscending 
+                ? allTickets.OrderBy(x => x.TicketReference).ToList() 
+                : allTickets.OrderByDescending(x => x.TicketReference).ToList(),
+            "ProcessingAction" => isAscending 
+                ? allTickets.OrderBy(x => x.ProcessingAction).ToList() 
+                : allTickets.OrderByDescending(x => x.ProcessingAction).ToList(),
+            "PriorityLevel" => isAscending 
+                ? allTickets.OrderBy(x => x.PriorityLevel).ToList() 
+                : allTickets.OrderByDescending(x => x.PriorityLevel).ToList(),
+            "Status" => isAscending 
+                ? allTickets.OrderBy(x => x.Status).ToList() 
+                : allTickets.OrderByDescending(x => x.Status).ToList(),
+            "OverdueDays" => isAscending 
+                ? allTickets.OrderBy(x => x.OverdueDays).ToList() 
+                : allTickets.OrderByDescending(x => x.OverdueDays).ToList(),
+            "IsAutoProcessed" => isAscending 
+                ? allTickets.OrderBy(x => x.IsAutoProcessed).ToList() 
+                : allTickets.OrderByDescending(x => x.IsAutoProcessed).ToList(),
+            "ProcessedBy" => isAscending 
+                ? allTickets.OrderBy(x => x.ProcessedBy).ToList() 
+                : allTickets.OrderByDescending(x => x.ProcessedBy).ToList(),
+            "CreatedDate" => isAscending 
+                ? allTickets.OrderBy(x => x.CreatedDate).ToList() 
+                : allTickets.OrderByDescending(x => x.CreatedDate).ToList(),
+            "TypeName" => isAscending 
+                ? allTickets.OrderBy(x => x.ProcessingTypeVietN?.TypeName).ToList() 
+                : allTickets.OrderByDescending(x => x.ProcessingTypeVietN?.TypeName).ToList(),
+            _ => allTickets.OrderByDescending(x => x.CreatedDate).ToList()
+        };
     }
 
     private void UpdatePagedTickets()
