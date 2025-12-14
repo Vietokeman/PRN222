@@ -1,163 +1,160 @@
 ﻿@page "/ticketprocessingvietns/details"
-@attribute [Authorize]
-@using Microsoft.AspNetCore.Authorization
-@using FFHRRequestSystem.Services.VietN
-@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
 @using FFHRRequestSystem.Entitites.VietN.Models
-@inject NavigationManager NavigationManager
-@inject TicketProcessingVietNService _ticketProcessingService
+@using FFHRRequestSystem.Services.VietN
+@inject TicketProcessingVietNService _ticketService
+@inject NavigationManager _navigationManager
 
 <PageTitle>Ticket Processing Details</PageTitle>
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary">
-            <i class="bi bi-ticket-detailed me-2"></i>Ticket Processing Details
+        <h2 class="fw-bold text-info">
+            <i class="bi bi-info-circle me-2"></i>Ticket Processing Details
         </h2>
-        <div>
-            <a href="@($"/ticketprocessingvietns/edit?ticketprocessingvietnid={ticketprocessingvietn?.TicketProcessingVietNid}")" class="btn btn-primary me-2">
-                <i class="bi bi-pencil"></i> Edit
-            </a>
-            <a href="/ticketprocessingvietns" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Back to List
-            </a>
-        </div>
+        <a href="/ticketprocessingvietns" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
     </div>
 
-    <div>
-        @if (ticketprocessingvietn is null)
-        {
-            <p><em>Loading...</em></p>
-        }
-        else
-        {
-            <!-- Basic Information Card -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-info-circle me-2"></i>Basic Information
-                    </h5>
+    @if (ticketprocessingvietn is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Basic Information -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Processing Code</dt>
+                            <dd class="col-sm-8"><strong>@ticketprocessingvietn.ProcessingCode</strong></dd>
+                            
+                            <dt class="col-sm-4">Ticket Reference</dt>
+                            <dd class="col-sm-8">@ticketprocessingvietn.TicketReference</dd>
+                            
+                            <dt class="col-sm-4">Processing Type</dt>
+                            <dd class="col-sm-8">@ticketprocessingvietn.ProcessingTypeVietN?.TypeName</dd>
+                            
+                            <dt class="col-sm-4">Related Ticket</dt>
+                            <dd class="col-sm-8">@ticketprocessingvietn.RelatedTicketCode</dd>
+                        </dl>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="border rounded p-3 h-100">
-                                <label class="form-label fw-bold text-muted">Processing Code</label>
-                                <p class="mb-0 fs-5">@ticketprocessingvietn.ProcessingCode</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="border rounded p-3 h-100">
-                                <label class="form-label fw-bold text-muted">Ticket Reference</label>
-                                <p class="mb-0 fs-5">@ticketprocessingvietn.TicketReference</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="border rounded p-3 h-100">
-                                <label class="form-label fw-bold text-muted">Processing Type</label>
-                                <p class="mb-0 fs-5">@ticketprocessingvietn.ProcessingTypeVietN?.TypeName</p>
-                            </div>
-                        </div>
+
+                <!-- Processing Details -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Processing Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Processing Action</dt>
+                            <dd class="col-sm-8">@ticketprocessingvietn.ProcessingAction</dd>
+                            
+                            <dt class="col-sm-4">Action Description</dt>
+                            <dd class="col-sm-8">@ticketprocessingvietn.ActionDescription</dd>
+                            
+                            <dt class="col-sm-4">Resolved Note</dt>
+                            <dd class="col-sm-8">@ticketprocessingvietn.ResolvedNote</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Additional Info -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Additional Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Is Auto Processed</dt>
+                            <dd class="col-sm-8">
+                                @if (ticketprocessingvietn.IsAutoProcessed)
+                                {
+                                    <span class="badge badge-info">Auto</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-secondary">Manual</span>
+                                }
+                            </dd>
+                            
+                            <dt class="col-sm-4">Processed By</dt>
+                            <dd class="col-sm-8">@ticketprocessingvietn.ProcessedBy</dd>
+                            
+                            <dt class="col-sm-4">Processed Date</dt>
+                            <dd class="col-sm-8">@ticketprocessingvietn.ProcessedDate?.ToString("yyyy-MM-dd HH:mm")</dd>
+                            
+                            <dt class="col-sm-4">Created Date</dt>
+                            <dd class="col-sm-8">@ticketprocessingvietn.CreatedDate?.ToString("yyyy-MM-dd HH:mm")</dd>
+                            
+                            <dt class="col-sm-4">Modified Date</dt>
+                            <dd class="col-sm-8">@ticketprocessingvietn.ModifiedDate?.ToString("yyyy-MM-dd HH:mm")</dd>
+                        </dl>
                     </div>
                 </div>
             </div>
 
-            <!-- Processing Details Card -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-gear me-2"></i>Processing Details
-                    </h5>
+            <div class="col-lg-4">
+                <!-- Status Card -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-flag me-2"></i>Status & Priority</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Priority</dt>
+                            <dd class="col-sm-7">
+                                @{
+                                    var priorityText = ticketprocessingvietn.PriorityLevel switch { 3 => "High", 2 => "Medium", _ => "Low" };
+                                    var priorityClass = ticketprocessingvietn.PriorityLevel switch { 3 => "badge-danger", 2 => "badge-warning", _ => "badge-secondary" };
+                                }
+                                <span class="badge @priorityClass">@priorityText</span>
+                            </dd>
+                            
+                            <dt class="col-sm-5">Status</dt>
+                            <dd class="col-sm-7">
+                                @{
+                                    var statusText = ticketprocessingvietn.Status switch { 1 => "Active", 2 => "Resolved", 3 => "Closed", _ => "Unknown" };
+                                    var statusClass = ticketprocessingvietn.Status switch { 1 => "badge-success", 2 => "badge-info", 3 => "badge-secondary", _ => "badge-secondary" };
+                                }
+                                <span class="badge @statusClass">@statusText</span>
+                            </dd>
+                            
+                            <dt class="col-sm-5">Overdue Days</dt>
+                            <dd class="col-sm-7">@ticketprocessingvietn.OverdueDays</dd>
+                            
+                            <dt class="col-sm-5">Escalation</dt>
+                            <dd class="col-sm-7">Level @ticketprocessingvietn.EscalationLevel</dd>
+                        </dl>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-3">Processing Action</dt>
-                        <dd class="col-sm-9">@ticketprocessingvietn.ProcessingAction</dd>
-                        <dt class="col-sm-3">Action Description</dt>
-                        <dd class="col-sm-9">@ticketprocessingvietn.ActionDescription</dd>
-                        <dt class="col-sm-3">Related Ticket Code</dt>
-                        <dd class="col-sm-9">@ticketprocessingvietn.RelatedTicketCode</dd>
-                        <dt class="col-sm-3">Priority Level</dt>
-                        <dd class="col-sm-9">
-                            @{
-                                string priorityText = ticketprocessingvietn.PriorityLevel switch
-                                {
-                                    3 => "High",
-                                    2 => "Medium",
-                                    _ => "Low"
-                                };
-                                string priorityClass = ticketprocessingvietn.PriorityLevel switch
-                                {
-                                    3 => "badge bg-danger",
-                                    2 => "badge bg-warning text-dark",
-                                    _ => "badge bg-secondary"
-                                };
-                            }
-                            <span class="@priorityClass">@priorityText</span>
-                        </dd>
-                        <dt class="col-sm-3">Status</dt>
-                        <dd class="col-sm-9">
-                            @{
-                                string statusText = ticketprocessingvietn.Status switch
-                                {
-                                    1 => "Active",
-                                    2 => "Resolved",
-                                    3 => "Closed",
-                                    _ => "Unknown"
-                                };
-                                string statusClass = ticketprocessingvietn.Status switch
-                                {
-                                    1 => "badge bg-success",
-                                    2 => "badge bg-info",
-                                    3 => "badge bg-secondary",
-                                    _ => "badge bg-secondary"
-                                };
-                            }
-                            <span class="@statusClass">@statusText</span>
-                        </dd>
-                        <dt class="col-sm-3">Overdue Days</dt>
-                        <dd class="col-sm-9">@ticketprocessingvietn.OverdueDays</dd>
-                        <dt class="col-sm-3">Escalation Level</dt>
-                        <dd class="col-sm-9">@ticketprocessingvietn.EscalationLevel</dd>
-                        <dt class="col-sm-3">Is Auto Processed</dt>
-                        <dd class="col-sm-9">
-                            @if (ticketprocessingvietn.IsAutoProcessed == true)
-                            {
-                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Yes</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> No</span>
-                            }
-                        </dd>
-                        <dt class="col-sm-3">Processed By</dt>
-                        <dd class="col-sm-9">@ticketprocessingvietn.ProcessedBy</dd>
-                        <dt class="col-sm-3">Processed Date</dt>
-                        <dd class="col-sm-9">@ticketprocessingvietn.ProcessedDate?.ToString("yyyy-MM-dd HH:mm")</dd>
-                        <dt class="col-sm-3">Resolved Note</dt>
-                        <dd class="col-sm-9">@ticketprocessingvietn.ResolvedNote</dd>
-                    </dl>
-                </div>
-            </div>
 
-            <!-- System Information Card -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-clock-history me-2"></i>System Information
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-3">Created Date</dt>
-                        <dd class="col-sm-9">@ticketprocessingvietn.CreatedDate?.ToString("yyyy-MM-dd HH:mm")</dd>
-                        <dt class="col-sm-3">Modified Date</dt>
-                        <dd class="col-sm-9">@ticketprocessingvietn.ModifiedDate?.ToString("yyyy-MM-dd HH:mm")</dd>
-                    </dl>
+                <!-- Actions -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/ticketprocessingvietns/edit?ticketprocessingvietnid=@ticketprocessingvietn.TicketProcessingVietNid" class="btn btn-primary">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a href="/ticketprocessingvietns/delete?ticketprocessingvietnid=@ticketprocessingvietn.TicketProcessingVietNid" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                            <a href="/ticketprocessingvietns" class="btn btn-secondary">
+                                <i class="bi bi-list"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        }
-    </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -168,10 +165,29 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ticketprocessingvietn = await _ticketProcessingService.GetByIdAsync(TicketProcessingVietNid);
-        if (ticketprocessingvietn is null)
+        Console.WriteLine("=== Details.razor OnInitializedAsync Started ===");
+        Console.WriteLine($"TicketProcessingVietNid: {TicketProcessingVietNid}");
+        
+        try
         {
-            NavigationManager.NavigateTo("notfound");
+            Console.WriteLine($"Loading ticket with ID: {TicketProcessingVietNid}");
+            ticketprocessingvietn = await _ticketService.GetByIdAsync(TicketProcessingVietNid);
+
+            if (ticketprocessingvietn is null)
+            {
+                Console.WriteLine("ERROR: Ticket not found!");
+                _navigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                Console.WriteLine($"Ticket loaded successfully: {ticketprocessingvietn.ProcessingCode}");
+            }
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR in OnInitializedAsync: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+        }
+        Console.WriteLine("=== Details.razor OnInitializedAsync Completed ===");
     }
 }

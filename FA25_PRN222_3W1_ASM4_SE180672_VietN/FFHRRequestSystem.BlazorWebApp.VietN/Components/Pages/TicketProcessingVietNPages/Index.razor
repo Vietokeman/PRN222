@@ -1,509 +1,563 @@
 ﻿@page "/ticketprocessingvietns"
-@attribute [Authorize]
-@using FFHRRequestSystem.Services.VietN
-@using Microsoft.EntityFrameworkCore
-@using FFHRRequestSystem.Entitites.VietN.Models
-@using Microsoft.AspNetCore.Authorization
-@inject FFHRRequestSystem.Services.VietN.TicketProcessingVietNService _ticketService
 @rendermode InteractiveServer
+@using FFHRRequestSystem.Entitites.VietN.Models
+@using FFHRRequestSystem.Services.VietN
+@inject TicketProcessingVietNService _ticketService
+@inject NavigationManager _navigationManager
+
 <PageTitle>Tickets Management</PageTitle>
 
 <div class="content-header">
     <h1><i class="bi bi-ticket-perforated"></i> Tickets Management</h1>
     <div class="header-actions">
-        <a href="ticketprocessingvietns/create" class="btn btn-success">
+        <a href="/ticketprocessingvietns/create" class="btn-add-new">
             <i class="bi bi-plus-circle"></i> ADD NEW TICKET
         </a>
     </div>
 </div>
 
 <!-- Search Filters -->
-<div class="card shadow-sm mb-4">
-    <div class="card-header" style="background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%); color: white;">
-        <h5 class="mb-0"><i class="bi bi-funnel"></i> Search Filters</h5>
+<div class="data-table-container" style="margin-bottom: 20px;">
+    <div class="table-header">
+        <h2>Search Filters</h2>
     </div>
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Processing Action</label>
-                <input type="text" 
-                       placeholder="Enter processing action..." 
-                       class="form-control" 
-                       @bind="searchProcessingAction" 
-                       @bind:event="oninput" />
+    <div style="padding: 20px;">
+        <EditForm Model="@this" FormName="TicketSearchForm" OnValidSubmit="HandleSearch">
+            <AntiforgeryToken />
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Processing Action</label>
+                    <InputText @bind-Value="ProcessingAction" class="form-control" placeholder="Enter processing action" />
+                </div>
+                <div class="form-group">
+                    <label>Action Description</label>
+                    <InputText @bind-Value="ActionDescription" class="form-control" placeholder="Enter action description" />
+                </div>
+                <div class="form-group">
+                    <label>Type Name</label>
+                    <InputText @bind-Value="TypeName" class="form-control" placeholder="Enter type name" />
+                </div>
             </div>
-            
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Action Description</label>
-                <input type="text" 
-                       placeholder="Enter action description..." 
-                       class="form-control" 
-                       @bind="searchActionDescription" 
-                       @bind:event="oninput" />
-            </div>
-            
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Type Name</label>
-                <input type="text" 
-                       placeholder="Enter type name..." 
-                       class="form-control" 
-                       @bind="searchTypeName" 
-                       @bind:event="oninput" />
-            </div>
-        </div>
-        
-        <div class="row mt-3">
-            <div class="col-12 d-flex gap-2 justify-content-end">
-                <button class="btn btn-secondary" @onclick="ResetSearch">
+            <div class="form-actions" style="margin-top: 0; padding-top: 0; border: none;">
+                <button type="button" @onclick="ClearSearch" class="btn-secondary">
                     <i class="bi bi-x-circle"></i> Clear
                 </button>
-                
-                <button class="btn btn-primary" @onclick="PerformSearch">
+                <button type="submit" class="btn-primary">
                     <i class="bi bi-search"></i> Search
                 </button>
             </div>
-        </div>
+        </EditForm>
     </div>
 </div>
 
 <!-- Data Table -->
-<div class="card shadow-sm">
-    <div class="card-header" style="background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%); color: white;">
-        <h5 class="mb-0"><i class="bi bi-table"></i> Ticket Processing Records</h5>
+<div class="data-table-container">
+    <div class="table-header">
+        <h2>Ticket Processing Records</h2>
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0" style="font-size: 14px;">
-                <thead style="background-color: #f8f9fa; position: sticky; top: 0; z-index: 10;">
+    @if (isLoading)
+    {
+        <div style="text-align: center; padding: 40px;">
+            <p><em>Loading...</em></p>
+        </div>
+    }
+    else
+    {
+        <div style="overflow-x: auto;">
+            <table id="ticketProcessingTable" class="data-table">
+                <thead>
                     <tr>
-                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("ProcessingCode")'>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <th>
+                            <a @onclick='() => SortBy("ProcessingCode")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
                                 Code
-                                @if (sortColumn == "ProcessingCode")
+                                @if (SortColumn == "ProcessingCode")
                                 {
-                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
                                 }
                                 else
                                 {
                                     <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
                                 }
-                            </div>
+                            </a>
                         </th>
-                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("TicketReference")'>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <th>
+                            <a @onclick='() => SortBy("TicketReference")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
                                 Ticket Ref
-                                @if (sortColumn == "TicketReference")
+                                @if (SortColumn == "TicketReference")
                                 {
-                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
                                 }
                                 else
                                 {
                                     <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
                                 }
-                            </div>
+                            </a>
                         </th>
-                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("TypeName")'>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
-                                Type
-                                @if (sortColumn == "TypeName")
-                                {
-                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
-                                }
-                                else
-                                {
-                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
-                                }
-                            </div>
-                        </th>
-                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("ProcessingAction")'>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <th>
+                            <a @onclick='() => SortBy("ProcessingAction")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
                                 Action
-                                @if (sortColumn == "ProcessingAction")
+                                @if (SortColumn == "ProcessingAction")
                                 {
-                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
                                 }
                                 else
                                 {
                                     <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
                                 }
-                            </div>
+                            </a>
                         </th>
-                        <th style="padding: 15px 10px; font-weight: 600;">Description</th>
-                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("PriorityLevel")'>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <th>Description</th>
+                        <th>
+                            <a @onclick='() => SortBy("PriorityLevel")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
                                 Priority
-                                @if (sortColumn == "PriorityLevel")
+                                @if (SortColumn == "PriorityLevel")
                                 {
-                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
                                 }
                                 else
                                 {
                                     <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
                                 }
-                            </div>
+                            </a>
                         </th>
-                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("Status")'>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <th>
+                            <a @onclick='() => SortBy("Status")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
                                 Status
-                                @if (sortColumn == "Status")
+                                @if (SortColumn == "Status")
                                 {
-                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
                                 }
                                 else
                                 {
                                     <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
                                 }
-                            </div>
+                            </a>
                         </th>
-                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("OverdueDays")'>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <th>
+                            <a @onclick='() => SortBy("OverdueDays")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
                                 Overdue
-                                @if (sortColumn == "OverdueDays")
+                                @if (SortColumn == "OverdueDays")
                                 {
-                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
                                 }
                                 else
                                 {
                                     <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
                                 }
-                            </div>
+                            </a>
                         </th>
-                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("IsAutoProcessed")'>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <th>
+                            <a @onclick='() => SortBy("EscalationLevel")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Escalation
+                                @if (SortColumn == "EscalationLevel")
+                                {
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a @onclick='() => SortBy("IsAutoProcessed")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
                                 Auto
-                                @if (sortColumn == "IsAutoProcessed")
+                                @if (SortColumn == "IsAutoProcessed")
                                 {
-                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
                                 }
                                 else
                                 {
                                     <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
                                 }
-                            </div>
+                            </a>
                         </th>
-                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("ProcessedBy")'>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <th>
+                            <a @onclick='() => SortBy("ProcessedBy")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
                                 Processed By
-                                @if (sortColumn == "ProcessedBy")
+                                @if (SortColumn == "ProcessedBy")
                                 {
-                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
                                 }
                                 else
                                 {
                                     <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
                                 }
-                            </div>
+                            </a>
                         </th>
-                        <th style="padding: 15px 10px; font-weight: 600; cursor: pointer;" @onclick='() => SortColumn("CreatedDate")'>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <th>Resolved Note</th>
+                        <th>
+                            <a @onclick='() => SortBy("CreatedDate")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
                                 Created
-                                @if (sortColumn == "CreatedDate")
+                                @if (SortColumn == "CreatedDate")
                                 {
-                                    <i class="bi bi-caret-@(sortDirection == "asc" ? "up" : "down")-fill"></i>
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
                                 }
                                 else
                                 {
                                     <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
                                 }
-                            </div>
+                            </a>
                         </th>
-                        <th style="padding: 15px 10px; text-align: center; font-weight: 600;">Actions</th>
+                        <th>
+                            <a @onclick='() => SortBy("ModifiedDate")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Modified
+                                @if (SortColumn == "ModifiedDate")
+                                {
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a @onclick='() => SortBy("TypeName")' @onclick:preventDefault="true" style="cursor: pointer; color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between;">
+                                Type Name
+                                @if (SortColumn == "TypeName")
+                                {
+                                    <i class="bi bi-caret-@(SortDirection == "asc" ? "up" : "down")-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-caret-down" style="opacity: 0.3;"></i>
+                                }
+                            </a>
+                        </th>
+                        <th style="text-align: center;">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach (var item in pagedTickets)
-                    {
-                        <tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 12px 10px; vertical-align: middle;">
-                                <strong>@item.ProcessingCode</strong>
-                            </td>
-                            <td style="padding: 12px 10px; vertical-align: middle;">@item.TicketReference</td>
-                            <td style="padding: 12px 10px; vertical-align: middle;">
-                                <span class="text-muted">@item.ProcessingTypeVietN?.TypeName</span>
-                            </td>
-                            <td style="padding: 12px 10px; vertical-align: middle;">@item.ProcessingAction</td>
-                            <td style="padding: 12px 10px; vertical-align: middle; max-width: 200px;">
-                                <span title="@item.ActionDescription" style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                    @item.ActionDescription
-                                </span>
-                            </td>
-                            <td style="padding: 12px 10px; vertical-align: middle;">
-                                @{
-                                    var (priorityText, priorityClass, priorityIcon) = item.PriorityLevel switch
+                    <tbody>
+                        @foreach (var item in PagedTickets)
+                        {
+                            <tr data-id="@item.TicketProcessingVietNid">
+                                <td>@item.ProcessingCode</td>
+                                <td>@item.TicketReference</td>
+                                <td>@item.ProcessingAction</td>
+                                <td>
+                                    <span title="@item.ActionDescription">
+                                        @(item.ActionDescription?.Length > 25 ? item.ActionDescription.Substring(0, 25) + "..." : item.ActionDescription)
+                                    </span>
+                                </td>
+                                <td>
+                                    @{
+                                        var priorityText = item.PriorityLevel switch { 3 => "High", 2 => "Medium", _ => "Low" };
+                                        var priorityClass = item.PriorityLevel switch { 3 => "badge-danger", 2 => "badge-warning", _ => "badge-secondary" };
+                                    }
+                                    <span class="badge @priorityClass">@priorityText</span>
+                                </td>
+                                <td>
+                                    @{
+                                        var statusText = item.Status switch { 1 => "Active", 2 => "Resolved", 3 => "Closed", _ => "Unknown" };
+                                        var statusClass = item.Status switch { 1 => "badge-success", 2 => "badge-info", 3 => "badge-secondary", _ => "badge-secondary" };
+                                    }
+                                    <span class="badge @statusClass">@statusText</span>
+                                </td>
+                                <td>@item.OverdueDays</td>
+                                <td>@item.EscalationLevel</td>
+                                <td>
+                                    @if (item.IsAutoProcessed)
                                     {
-                                        3 => ("High", "badge bg-danger", "bi-exclamation-triangle-fill"),
-                                        2 => ("Medium", "badge bg-warning", "bi-exclamation-circle-fill"),
-                                        _ => ("Low", "badge bg-secondary", "bi-info-circle-fill")
-                                    };
-                                }
-                                <span class="@priorityClass" style="padding: 6px 12px; border-radius: 20px; font-size: 12px;">
-                                    <i class="bi @priorityIcon"></i> @priorityText
-                                </span>
-                            </td>
-                            <td style="padding: 12px 10px; vertical-align: middle;">
-                                @{
-                                    var (statusText, statusClass, statusIcon) = item.Status switch
+                                        <span class="badge badge-info">Auto</span>
+                                    }
+                                    else
                                     {
-                                        1 => ("Active", "badge bg-success", "bi-play-circle-fill"),
-                                        2 => ("Resolved", "badge bg-info", "bi-check-circle-fill"),
-                                        3 => ("Closed", "badge bg-secondary", "bi-x-circle-fill"),
-                                        _ => ("Unknown", "badge bg-secondary", "bi-question-circle-fill")
-                                    };
-                                }
-                                <span class="@statusClass" style="padding: 6px 12px; border-radius: 20px; font-size: 12px;">
-                                    <i class="bi @statusIcon"></i> @statusText
-                                </span>
-                            </td>
-                            <td style="padding: 12px 10px; vertical-align: middle;">
-                                @if (item.OverdueDays > 0)
-                                {
-                                    <span class="text-danger fw-bold">@item.OverdueDays</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">@item.OverdueDays</span>
-                                }
-                            </td>
-                            <td style="padding: 12px 10px; vertical-align: middle; text-align: center;">
-                                @if (item.IsAutoProcessed == true)
-                                {
-                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 18px;"></i>
-                                }
-                                else
-                                {
-                                    <i class="bi bi-x-circle-fill text-danger" style="font-size: 18px;"></i>
-                                }
-                            </td>
-                            <td style="padding: 12px 10px; vertical-align: middle;">
-                                <span class="text-primary fw-semibold">@item.ProcessedBy</span>
-                            </td>
-                            <td style="padding: 12px 10px; vertical-align: middle;">
-                                <small class="text-muted">@item.CreatedDate?.ToString("yyyy-MM-dd")</small>
-                            </td>
-                            <td style="padding: 12px 10px; vertical-align: middle; text-align: center;">
-                                <div class="btn-group" role="group">
-                                    <a href="@($"ticketprocessingvietns/details?ticketprocessingvietnid={item.TicketProcessingVietNid}")" 
-                                       class="btn btn-sm btn-info" 
-                                       title="Details"
-                                       style="border-radius: 6px 0 0 6px;">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a href="@($"ticketprocessingvietns/edit?ticketprocessingvietnid={item.TicketProcessingVietNid}")" 
-                                       class="btn btn-sm btn-warning" 
-                                       title="Edit"
-                                       style="border-radius: 0;">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a href="@($"ticketprocessingvietns/delete?ticketprocessingvietnid={item.TicketProcessingVietNid}")" 
-                                       class="btn btn-sm btn-danger" 
-                                       title="Delete"
-                                       style="border-radius: 0 6px 6px 0;">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                                        <span class="badge badge-secondary">Manual</span>
+                                    }
+                                </td>
+                                <td>@item.ProcessedBy</td>
+                                <td>
+                                    <span title="@item.ResolvedNote">
+                                        @(item.ResolvedNote?.Length > 20 ? item.ResolvedNote.Substring(0, 20) + "..." : item.ResolvedNote)
+                                    </span>
+                                </td>
+                                <td>@item.CreatedDate?.ToString("yyyy-MM-dd")</td>
+                                <td>@item.ModifiedDate?.ToString("yyyy-MM-dd")</td>
+                                <td>@item.ProcessingTypeVietN?.TypeName</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="/ticketprocessingvietns/details?ticketprocessingvietnid=@item.TicketProcessingVietNid" class="btn-action btn-view" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="/ticketprocessingvietns/edit?ticketprocessingvietnid=@item.TicketProcessingVietNid" class="btn-action btn-edit" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="/ticketprocessingvietns/delete?ticketprocessingvietnid=@item.TicketProcessingVietNid" class="btn-action btn-delete" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                 </tbody>
             </table>
         </div>
         
         <!-- Pagination -->
-        <div class="pagination-container">
+        <style>
+            .pagination-link { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #666; cursor: pointer; }
+            .pagination-link:hover:not(.disabled) { background-color: rgba(0, 123, 255, 0.17); }
+            .pagination-link.disabled { color: #999; cursor: not-allowed; opacity: 0.5; pointer-events: none; }
+            .pagination-link.active { background-color: #007bff !important; color: white !important; border-color: #007bff; }
+        </style>
+        
+        <div class="pagination-container" style="padding: 20px; display: flex; align-items: center; justify-content: space-between;">
             <div class="pagination-info">
-                <span class="text-muted">
-                    Showing <strong>@FromEntry</strong> to <strong>@ToEntry</strong> of <strong>@totalItems</strong> entries
+                <span style="color: #666;">
+                    Showing <strong>@FromEntry</strong> to <strong>@ToEntry</strong> of <strong>@TotalItems</strong> entries
                 </span>
             </div>
-            
-            <div class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center gap-2">
-                    <label class="mb-0 text-muted" style="font-size: 14px;">Show:</label>
-                    <select class="form-select form-select-sm" style="width: auto;" @onchange="HandlePageSizeChange">
+
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label style="margin: 0; color: #666;">Show:</label>
+                    <select @bind="PageSize" @bind:after="ChangePageSize" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
                         @foreach (var size in PageSizeOptions)
                         {
-                            <option value="@size" selected="@(size == pageSize)">@size</option>
+                            <option value="@size">@size</option>
                         }
                     </select>
                 </div>
-                
+
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                            <button class="page-link" @onclick="() => ChangePage(1)" disabled="@(currentPage == 1)">
-                                <i class="bi bi-chevron-double-left"></i>
-                            </button>
-                        </li>
-                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                            <button class="page-link" @onclick="() => ChangePage(currentPage - 1)" disabled="@(currentPage == 1)">
-                                <i class="bi bi-chevron-left"></i>
-                            </button>
+                    <ul style="list-style: none; margin: 0; padding: 0; display: flex; gap: 5px;">
+                        <!-- First Page -->
+                        <li>
+                            @if (CurrentPage == 1)
+                            {
+                                <span class="pagination-link disabled"><i class="bi bi-chevron-double-left"></i></span>
+                            }
+                            else
+                            {
+                                <a @onclick="() => GoToPage(1)" @onclick:preventDefault="true" class="pagination-link"><i class="bi bi-chevron-double-left"></i></a>
+                            }
                         </li>
                         
+                        <!-- Previous Page -->
+                        <li>
+                            @if (CurrentPage == 1)
+                            {
+                                <span class="pagination-link disabled"><i class="bi bi-chevron-left"></i></span>
+                            }
+                            else
+                            {
+                                <a @onclick="() => GoToPage(CurrentPage - 1)" @onclick:preventDefault="true" class="pagination-link"><i class="bi bi-chevron-left"></i></a>
+                            }
+                        </li>
+                        
+                        <!-- Page Numbers -->
                         @foreach (var pageNum in GetPageNumbers())
                         {
-                            <li class="page-item @(pageNum == currentPage ? "active" : "")">
-                                <button class="page-link" @onclick="() => ChangePage(pageNum)">
-                                    @pageNum
-                                </button>
+                            <li>
+                                @if (pageNum == CurrentPage)
+                                {
+                                    <span class="pagination-link active">@pageNum</span>
+                                }
+                                else
+                                {
+                                    <a @onclick="() => GoToPage(pageNum)" @onclick:preventDefault="true" class="pagination-link">@pageNum</a>
+                                }
                             </li>
                         }
                         
-                        <li class="page-item @(currentPage == TotalPages ? "disabled" : "")">
-                            <button class="page-link" @onclick="() => ChangePage(currentPage + 1)" disabled="@(currentPage == TotalPages)">
-                                <i class="bi bi-chevron-right"></i>
-                            </button>
+                        <!-- Next Page -->
+                        <li>
+                            @if (CurrentPage == TotalPages)
+                            {
+                                <span class="pagination-link disabled"><i class="bi bi-chevron-right"></i></span>
+                            }
+                            else
+                            {
+                                <a @onclick="() => GoToPage(CurrentPage + 1)" @onclick:preventDefault="true" class="pagination-link"><i class="bi bi-chevron-right"></i></a>
+                            }
                         </li>
-                        <li class="page-item @(currentPage == TotalPages ? "disabled" : "")">
-                            <button class="page-link" @onclick="() => ChangePage(TotalPages)" disabled="@(currentPage == TotalPages)">
-                                <i class="bi bi-chevron-double-right"></i>
-                            </button>
+                        
+                        <!-- Last Page -->
+                        <li>
+                            @if (CurrentPage == TotalPages)
+                            {
+                                <span class="pagination-link disabled"><i class="bi bi-chevron-double-right"></i></span>
+                            }
+                            else
+                            {
+                                <a @onclick="() => GoToPage(TotalPages)" @onclick:preventDefault="true" class="pagination-link"><i class="bi bi-chevron-double-right"></i></a>
+                            }
                         </li>
                     </ul>
                 </nav>
             </div>
         </div>
-    </div>
+    }
 </div>
 
 @code {
-    private List<TicketProcessingVietN> allTickets = new();
-    private List<TicketProcessingVietN> pagedTickets = new();
-    private int currentPage = 1;
-    private int pageSize = 10;
-    private int totalItems = 0;
-    private int[] PageSizeOptions = new[] { 5, 10, 25, 50, 100 };
+    private List<TicketProcessingVietN> AllTickets { get; set; } = new();
+    private List<TicketProcessingVietN> PagedTickets { get; set; } = new();
+    private bool isLoading = true;
 
-    private string searchProcessingAction = "";
-    private string searchActionDescription = "";
-    private string searchTypeName = "";
+    // Search parameters
+    private string ProcessingAction { get; set; } = string.Empty;
+    private string ActionDescription { get; set; } = string.Empty;
+    private string TypeName { get; set; } = string.Empty;
 
-    private string sortColumn = "CreatedDate";
-    private string sortDirection = "desc";
+    // Pagination
+    private int CurrentPage { get; set; } = 1;
+    private int PageSize { get; set; } = 10;
+    private int TotalItems { get; set; }
+    private int TotalPages { get; set; }
+    private int FromEntry { get; set; }
+    private int ToEntry { get; set; }
+    private int[] PageSizeOptions { get; set; } = new[] { 5, 10, 25, 50, 100 };
 
-    private int TotalPages => (int)Math.Ceiling((double)totalItems / pageSize);
-    private int FromEntry => totalItems == 0 ? 0 : (currentPage - 1) * pageSize + 1;
-    private int ToEntry => Math.Min(currentPage * pageSize, totalItems);
+    // Sorting
+    private string SortColumn { get; set; } = "CreatedDate";
+    private string SortDirection { get; set; } = "desc";
 
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine("=== Index.razor OnInitializedAsync Started ===");
         await LoadData();
+        Console.WriteLine("=== Index.razor OnInitializedAsync Completed ===");
     }
 
     private async Task LoadData()
     {
-        allTickets = await _ticketService.GetAllAsync();
-        ApplySorting();
-        totalItems = allTickets.Count;
-        UpdatePagedTickets();
-    }
-
-    private async Task PerformSearch()
-    {
-        allTickets = await _ticketService.SearchAsync(searchProcessingAction, searchActionDescription, searchTypeName);
-        currentPage = 1;
-        ApplySorting();
-        totalItems = allTickets.Count;
-        UpdatePagedTickets();
-    }
-
-    private async Task ResetSearch()
-    {
-        searchProcessingAction = "";
-        searchActionDescription = "";
-        searchTypeName = "";
-        currentPage = 1;
-        await LoadData();
-    }
-
-    private void SortColumn(string columnName)
-    {
-        if (sortColumn == columnName)
+        Console.WriteLine("=== LoadData Started ===");
+        isLoading = true;
+        try
         {
-            sortDirection = sortDirection == "asc" ? "desc" : "asc";
+            Console.WriteLine($"ProcessingAction: {ProcessingAction}");
+            Console.WriteLine($"ActionDescription: {ActionDescription}");
+            Console.WriteLine($"TypeName: {TypeName}");
+            
+            if (!string.IsNullOrEmpty(ProcessingAction) || !string.IsNullOrEmpty(ActionDescription) || !string.IsNullOrEmpty(TypeName))
+            {
+                Console.WriteLine("Performing search...");
+                AllTickets = await _ticketService.SearchAsync(ProcessingAction, ActionDescription, TypeName);
+                Console.WriteLine($"Search returned {AllTickets.Count} tickets");
+            }
+            else
+            {
+                Console.WriteLine("Loading all tickets...");
+                AllTickets = await _ticketService.GetAllAsync();
+                Console.WriteLine($"Loaded {AllTickets.Count} tickets");
+            }
+
+            Console.WriteLine("Applying sorting...");
+            ApplySorting();
+            
+            Console.WriteLine("Applying pagination...");
+            ApplyPagination();
         }
-        else
+        catch (Exception ex)
         {
-            sortColumn = columnName;
-            sortDirection = "asc";
+            Console.WriteLine($"ERROR in LoadData: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+            }
         }
-        
-        currentPage = 1;
-        ApplySorting();
-        UpdatePagedTickets();
-        StateHasChanged();
+        finally
+        {
+            isLoading = false;
+            Console.WriteLine($"Loading complete. isLoading = {isLoading}");
+        }
+        Console.WriteLine("=== LoadData Completed ===");
     }
 
     private void ApplySorting()
     {
-        if (string.IsNullOrEmpty(sortColumn))
-            return;
+        var query = AllTickets.AsQueryable();
+        var isAscending = SortDirection?.ToLower() == "asc";
 
-        var isAscending = sortDirection == "asc";
-
-        allTickets = sortColumn switch
+        query = SortColumn switch
         {
-            "ProcessingCode" => isAscending 
-                ? allTickets.OrderBy(x => x.ProcessingCode).ToList() 
-                : allTickets.OrderByDescending(x => x.ProcessingCode).ToList(),
-            "TicketReference" => isAscending 
-                ? allTickets.OrderBy(x => x.TicketReference).ToList() 
-                : allTickets.OrderByDescending(x => x.TicketReference).ToList(),
-            "ProcessingAction" => isAscending 
-                ? allTickets.OrderBy(x => x.ProcessingAction).ToList() 
-                : allTickets.OrderByDescending(x => x.ProcessingAction).ToList(),
-            "PriorityLevel" => isAscending 
-                ? allTickets.OrderBy(x => x.PriorityLevel).ToList() 
-                : allTickets.OrderByDescending(x => x.PriorityLevel).ToList(),
-            "Status" => isAscending 
-                ? allTickets.OrderBy(x => x.Status).ToList() 
-                : allTickets.OrderByDescending(x => x.Status).ToList(),
-            "OverdueDays" => isAscending 
-                ? allTickets.OrderBy(x => x.OverdueDays).ToList() 
-                : allTickets.OrderByDescending(x => x.OverdueDays).ToList(),
-            "IsAutoProcessed" => isAscending 
-                ? allTickets.OrderBy(x => x.IsAutoProcessed).ToList() 
-                : allTickets.OrderByDescending(x => x.IsAutoProcessed).ToList(),
-            "ProcessedBy" => isAscending 
-                ? allTickets.OrderBy(x => x.ProcessedBy).ToList() 
-                : allTickets.OrderByDescending(x => x.ProcessedBy).ToList(),
-            "CreatedDate" => isAscending 
-                ? allTickets.OrderBy(x => x.CreatedDate).ToList() 
-                : allTickets.OrderByDescending(x => x.CreatedDate).ToList(),
-            "TypeName" => isAscending 
-                ? allTickets.OrderBy(x => x.ProcessingTypeVietN?.TypeName).ToList() 
-                : allTickets.OrderByDescending(x => x.ProcessingTypeVietN?.TypeName).ToList(),
-            _ => allTickets.OrderByDescending(x => x.CreatedDate).ToList()
+            "ProcessingCode" => isAscending ? query.OrderBy(x => x.ProcessingCode) : query.OrderByDescending(x => x.ProcessingCode),
+            "TicketReference" => isAscending ? query.OrderBy(x => x.TicketReference) : query.OrderByDescending(x => x.TicketReference),
+            "ProcessingAction" => isAscending ? query.OrderBy(x => x.ProcessingAction) : query.OrderByDescending(x => x.ProcessingAction),
+            "PriorityLevel" => isAscending ? query.OrderBy(x => x.PriorityLevel) : query.OrderByDescending(x => x.PriorityLevel),
+            "Status" => isAscending ? query.OrderBy(x => x.Status) : query.OrderByDescending(x => x.Status),
+            "OverdueDays" => isAscending ? query.OrderBy(x => x.OverdueDays) : query.OrderByDescending(x => x.OverdueDays),
+            "EscalationLevel" => isAscending ? query.OrderBy(x => x.EscalationLevel) : query.OrderByDescending(x => x.EscalationLevel),
+            "IsAutoProcessed" => isAscending ? query.OrderBy(x => x.IsAutoProcessed) : query.OrderByDescending(x => x.IsAutoProcessed),
+            "ProcessedBy" => isAscending ? query.OrderBy(x => x.ProcessedBy) : query.OrderByDescending(x => x.ProcessedBy),
+            "CreatedDate" => isAscending ? query.OrderBy(x => x.CreatedDate) : query.OrderByDescending(x => x.CreatedDate),
+            "ModifiedDate" => isAscending ? query.OrderBy(x => x.ModifiedDate) : query.OrderByDescending(x => x.ModifiedDate),
+            "TypeName" => isAscending ? query.OrderBy(x => x.ProcessingTypeVietN.TypeName) : query.OrderByDescending(x => x.ProcessingTypeVietN.TypeName),
+            _ => query.OrderByDescending(x => x.CreatedDate)
         };
+
+        AllTickets = query.ToList();
     }
 
-    private void UpdatePagedTickets()
+    private void ApplyPagination()
     {
-        pagedTickets = allTickets
-            .Skip((currentPage - 1) * pageSize)
-            .Take(pageSize)
+        TotalItems = AllTickets.Count;
+        TotalPages = (int)Math.Ceiling((double)TotalItems / PageSize);
+
+        if (CurrentPage < 1) CurrentPage = 1;
+        if (CurrentPage > TotalPages && TotalPages > 0) CurrentPage = TotalPages;
+
+        FromEntry = TotalItems == 0 ? 0 : (CurrentPage - 1) * PageSize + 1;
+        ToEntry = Math.Min(CurrentPage * PageSize, TotalItems);
+
+        PagedTickets = AllTickets
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize)
             .ToList();
     }
 
-    private void ChangePage(int newPage)
+    private async Task HandleSearch()
     {
-        if (newPage >= 1 && newPage <= TotalPages)
-        {
-            currentPage = newPage;
-            UpdatePagedTickets();
-            StateHasChanged();
-        }
+        Console.WriteLine("=== HandleSearch Started ===");
+        CurrentPage = 1;
+        await LoadData();
+        Console.WriteLine("=== HandleSearch Completed ===");
     }
 
-    private void HandlePageSizeChange(ChangeEventArgs e)
+    private async Task ClearSearch()
     {
-        if (int.TryParse(e.Value?.ToString(), out int newSize))
+        Console.WriteLine("=== ClearSearch Started ===");
+        ProcessingAction = string.Empty;
+        ActionDescription = string.Empty;
+        TypeName = string.Empty;
+        CurrentPage = 1;
+        await LoadData();
+        Console.WriteLine("=== ClearSearch Completed ===");
+    }
+
+    private async Task SortBy(string column)
+    {
+        Console.WriteLine($"=== SortBy Started: {column} ===");
+        if (SortColumn == column)
         {
-            pageSize = newSize;
-            currentPage = 1;
-            UpdatePagedTickets();
-            StateHasChanged();
+            SortDirection = SortDirection == "asc" ? "desc" : "asc";
+            Console.WriteLine($"Toggled sort direction to: {SortDirection}");
         }
+        else
+        {
+            SortColumn = column;
+            SortDirection = "asc";
+            Console.WriteLine($"New sort column: {SortColumn}, direction: {SortDirection}");
+        }
+        ApplySorting();
+        ApplyPagination();
+        Console.WriteLine("=== SortBy Completed ===");
+    }
+
+    private async Task GoToPage(int page)
+    {
+        if (page < 1 || page > TotalPages) return;
+        CurrentPage = page;
+        ApplyPagination();
+    }
+
+    private async Task ChangePageSize()
+    {
+        CurrentPage = 1;
+        ApplyPagination();
     }
 
     private List<int> GetPageNumbers()
@@ -512,7 +566,7 @@
         var maxPagesToShow = 5;
         var halfRange = maxPagesToShow / 2;
 
-        var startPage = Math.Max(1, currentPage - halfRange);
+        var startPage = Math.Max(1, CurrentPage - halfRange);
         var endPage = Math.Min(TotalPages, startPage + maxPagesToShow - 1);
 
         if (endPage - startPage < maxPagesToShow - 1)
@@ -528,4 +582,3 @@
         return pages;
     }
 }
-
