@@ -1,5 +1,7 @@
 ﻿@page "/ticketprocessingvietns/delete"
 @rendermode InteractiveServer
+@attribute [Authorize(Roles = "1, 3")]
+@using Microsoft.AspNetCore.Authorization
 @using Blazored.Toast.Services
 @using FFHRRequestSystem.Entitites.VietN.Models
 @using FFHRRequestSystem.Services.VietN

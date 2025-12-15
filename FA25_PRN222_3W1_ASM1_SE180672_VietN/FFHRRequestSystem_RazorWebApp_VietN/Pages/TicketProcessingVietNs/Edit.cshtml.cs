@@ -51,11 +51,30 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            // Custom validation
+            if (!string.IsNullOrEmpty(TicketProcessingVietN.ProcessingCode))
+            {
+                var existingTickets = await _service.GetAllAsync();
+                if (existingTickets.Any(t => t.ProcessingCode.Equals(TicketProcessingVietN.ProcessingCode, StringComparison.OrdinalIgnoreCase) 
+                    && t.TicketProcessingVietNid != TicketProcessingVietN.TicketProcessingVietNid))
+                {
+                    ModelState.AddModelError("TicketProcessingVietN.ProcessingCode", "Processing Code already exists. Please use a unique code.");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(TicketProcessingVietN.TicketReference) && !ValidateTicketReference(TicketProcessingVietN.TicketReference))
+            {
+                ModelState.AddModelError("TicketProcessingVietN.TicketReference", "Ticket Reference must start with an uppercase letter and contain only letters, numbers, and spaces.");
+            }
+
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Invalid form data. Please check your input.";
+                TempData["ErrorMessage"] = "Please correct the validation errors and try again.";
+                var processingTypes = await _typeService.GetAllAsync();
+                ViewData["ProcessingTypeVietNid"] = new SelectList(processingTypes, "ProcessingTypeVietNid", "TypeName", TicketProcessingVietN.ProcessingTypeVietNid);
                 return Page();
             }
+            
             TicketProcessingVietN.ModifiedDate = DateTime.Now;
 
             // ✔ Không cho sửa CreatedDate
@@ -69,10 +88,18 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
             }
 
             TempData["ErrorMessage"] = $"Failed to update ticket '{TicketProcessingVietN.ProcessingCode}'.";
-            var processingTypes = await _typeService.GetAllAsync();
-            ViewData["ProcessingTypeVietNid"] = new SelectList(processingTypes, "ProcessingTypeVietNid", "TypeName");
+            var processingTypesForError = await _typeService.GetAllAsync();
+            ViewData["ProcessingTypeVietNid"] = new SelectList(processingTypesForError, "ProcessingTypeVietNid", "TypeName", TicketProcessingVietN.ProcessingTypeVietNid);
             return Page();
         }
 
+        private bool ValidateTicketReference(string ticketReference)
+        {
+            if (string.IsNullOrEmpty(ticketReference)) return false;
+
+            // Regex: starts with uppercase, followed by letters, numbers, spaces (for Title Case), no special chars
+            var regex = new Regex(@"^[A-Z][a-zA-Z0-9\s]*$");
+            return regex.IsMatch(ticketReference) && !ticketReference.Contains("@") && !ticketReference.Contains("#");
+        }
     }
 }

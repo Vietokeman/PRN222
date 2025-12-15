@@ -130,8 +130,22 @@
         const btnHubDelete = document.getElementById("btnHubDelete");
         btnHubDelete?.addEventListener("click", function (event) {
             event.preventDefault();
-            const ticketCode = document.querySelector('dl dd')?.textContent || 'Unknown';
+            
             const id = document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value;
+            
+            // Validate ID before deletion
+            if (!id || id.trim() === '' || id === '00000000-0000-0000-0000-000000000000') {
+                showToast("Invalid Ticket ID. Cannot delete.", "error");
+                return;
+            }
+
+            // Confirm deletion
+            if (!confirm("Are you sure you want to delete this ticket via SignalR? This action cannot be undone.")) {
+                showToast("Deletion cancelled", "info");
+                return;
+            }
+
+            const ticketCode = document.querySelector('dl dd')?.textContent || 'Unknown';
 
             showToast("Sending ticket deletion request...", "info");
             

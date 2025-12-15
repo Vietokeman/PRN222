@@ -48,6 +48,22 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            // Custom validation
+            if (!string.IsNullOrEmpty(TicketProcessingVietN.ProcessingCode))
+            {
+                var existingTicket = await _ticketService.GetAllAsync();
+                if (existingTicket.Any(t => t.ProcessingCode.Equals(TicketProcessingVietN.ProcessingCode, StringComparison.OrdinalIgnoreCase)))
+                {
+                    ModelState.AddModelError("TicketProcessingVietN.ProcessingCode", "Processing Code already exists. Please use a unique code.");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(TicketProcessingVietN.TicketReference) && !ValidateTicketReference(TicketProcessingVietN.TicketReference))
+            {
+                ModelState.AddModelError("TicketProcessingVietN.TicketReference", "Ticket Reference must start with an uppercase letter and contain only letters, numbers, and spaces.");
+            }
+
+
             if (ModelState.IsValid)
             {
                 // Ensure new Guid for ID
@@ -79,13 +95,15 @@ namespace FFHRRequestSystem_RazorWebApp_VietN.Pages.TicketProcessingVietNs
                     {
                         ModelState.AddModelError(string.Empty, $"Inner exception: {ex.InnerException.Message}");
                     }
-                    return Page();
                 }
                 var selectListItems = await _typeService.GetAllAsync();
                 ViewData["ProcessingTypeVietNid"] = new SelectList(selectListItems, "ProcessingTypeVietNid", "TypeName", TicketProcessingVietN.ProcessingTypeVietNid);
+                return Page();
             }
 
-            ModelState.AddModelError(string.Empty, "An error occurred while creating the ticket processing record.");
+            TempData["ErrorMessage"] = "Please correct the validation errors and try again.";
+            var processingTypes = await _typeService.GetAllAsync();
+            ViewData["ProcessingTypeVietNid"] = new SelectList(processingTypes, "ProcessingTypeVietNid", "TypeName", TicketProcessingVietN.ProcessingTypeVietNid);
             return Page();
         }
 

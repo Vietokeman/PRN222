@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace FFHRRequestSystem.Entitites.VietN.Models;
 
@@ -9,32 +10,50 @@ public partial class TicketProcessingVietN
 {
     public Guid TicketProcessingVietNid { get; set; }
 
+    [Required(ErrorMessage = "Processing Code is required")]
+    [StringLength(50, MinimumLength = 3, ErrorMessage = "Processing Code must be between 3 and 50 characters")]
+    [RegularExpression(@"^PROC-\d{4}-\d{4}$", ErrorMessage = "Processing Code must follow format PROC-xxxx-xxxx (e.g., PROC-2024-0003)")]
     public string ProcessingCode { get; set; }
 
+    [Required(ErrorMessage = "Ticket Reference is required")]
+    [StringLength(100, MinimumLength = 3, ErrorMessage = "Ticket Reference must be between 3 and 100 characters")]
     public string TicketReference { get; set; }
 
+    [Required(ErrorMessage = "Processing Type is required")]
     public int? ProcessingTypeVietNid { get; set; }
 
+    [Required(ErrorMessage = "Processing Action is required")]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "Processing Action must be between 3 and 200 characters")]
     public string ProcessingAction { get; set; }
 
+    [StringLength(500, ErrorMessage = "Action Description cannot exceed 500 characters")]
     public string ActionDescription { get; set; }
 
+    [StringLength(50, ErrorMessage = "Related Ticket Code cannot exceed 50 characters")]
     public string RelatedTicketCode { get; set; }
 
+    [Required(ErrorMessage = "Priority Level is required")]
+    [Range(1, 3, ErrorMessage = "Priority Level must be between 1 (Low) and 3 (High)")]
     public int PriorityLevel { get; set; }
 
+    [Required(ErrorMessage = "Status is required")]
+    [Range(1, 3, ErrorMessage = "Status must be between 1 (Active) and 3 (Closed)")]
     public int Status { get; set; }
 
+    [Range(0, 999, ErrorMessage = "Overdue Days must be between 0 and 999")]
     public decimal? OverdueDays { get; set; }
 
+    [Range(0, 5, ErrorMessage = "Escalation Level must be between 0 and 5")]
     public int? EscalationLevel { get; set; }
 
     public bool IsAutoProcessed { get; set; }
 
+    [StringLength(100, ErrorMessage = "Processed By cannot exceed 100 characters")]
     public string ProcessedBy { get; set; }
 
     public DateTime? ProcessedDate { get; set; }
 
+    [StringLength(1000, ErrorMessage = "Resolved Note cannot exceed 1000 characters")]
     public string ResolvedNote { get; set; }
 
     public DateTime? CreatedDate { get; set; }

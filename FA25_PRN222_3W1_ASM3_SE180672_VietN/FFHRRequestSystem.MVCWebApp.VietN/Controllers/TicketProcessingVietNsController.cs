@@ -156,7 +156,7 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
             }
             else
             {
-                TempData["ErrorMessage"] = "Invalid form data. Please check your input.";
+                TempData["ErrorMessage"] = "Please correct the validation errors and try again.";
             }
 
             var listTypes = await _processingTypeService.GetAllAsync();
@@ -215,6 +215,11 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
                     TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
                 }
             }
+            else
+            {
+                TempData["ErrorMessage"] = "Please correct the validation errors and try again.";
+            }
+            
             var listTypes = await _processingTypeService.GetAllAsync();
             ViewData["ProcessingTypeVietNid"] = new SelectList(listTypes, "ProcessingTypeVietNid", "TypeName", ticketProcessingVietN.ProcessingTypeVietNid);
             return View(ticketProcessingVietN);
@@ -258,6 +263,14 @@ namespace FFHRRequestSystem.MVCWebApp.VietN.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        private bool ValidateTicketReference(string ticketReference)
+        {
+            if (string.IsNullOrEmpty(ticketReference)) return false;
+
+            // Regex: starts with uppercase, followed by letters, numbers, spaces (for Title Case), no special chars
+            var regex = new System.Text.RegularExpressions.Regex(@"^[A-Z][a-zA-Z0-9\s]*$");
+            return regex.IsMatch(ticketReference) && !ticketReference.Contains("@") && !ticketReference.Contains("#");
+        }
 
     }
 }

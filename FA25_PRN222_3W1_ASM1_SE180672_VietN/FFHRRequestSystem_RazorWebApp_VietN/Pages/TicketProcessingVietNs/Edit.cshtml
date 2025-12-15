@@ -200,6 +200,106 @@
             }).showToast();
         }
 
+        function validateFormUpdate() {
+            const processingCode = document.getElementById("TicketProcessingVietN_ProcessingCode").value;
+            const ticketReference = document.getElementById("TicketProcessingVietN_TicketReference").value;
+            const processingTypeId = document.getElementById("TicketProcessingVietN_ProcessingTypeVietNid").value;
+            const processingAction = document.getElementById("TicketProcessingVietN_ProcessingAction").value;
+            const priorityLevel = document.getElementById("TicketProcessingVietN_PriorityLevel").value;
+            const status = document.getElementById("TicketProcessingVietN_Status").value;
+
+            let errors = [];
+            
+            // Required field validations
+            if (!processingCode?.trim()) {
+                errors.push("Processing Code is required");
+            } else {
+                // Validate format PROC-xxxx-xxxx
+                const procCodeRegex = /^PROC-\d{4}-\d{4}$/;
+                if (!procCodeRegex.test(processingCode)) {
+                    errors.push("Processing Code must follow format PROC-xxxx-xxxx (e.g., PROC-2024-0003)");
+                }
+                if (processingCode.length < 3 || processingCode.length > 50) {
+                    errors.push("Processing Code must be between 3 and 50 characters");
+                }
+            }
+            
+            if (!ticketReference?.trim()) {
+                errors.push("Ticket Reference is required");
+            } else {
+                if (ticketReference.length < 3 || ticketReference.length > 100) {
+                    errors.push("Ticket Reference must be between 3 and 100 characters");
+                }
+            }
+            
+            if (!processingTypeId) {
+                errors.push("Processing Type is required");
+            }
+            
+            if (!processingAction?.trim()) {
+                errors.push("Processing Action is required");
+            } else {
+                if (processingAction.length < 3 || processingAction.length > 200) {
+                    errors.push("Processing Action must be between 3 and 200 characters");
+                }
+            }
+            
+            if (!priorityLevel) {
+                errors.push("Priority Level is required");
+            } else {
+                const priority = parseInt(priorityLevel);
+                if (priority < 1 || priority > 3) {
+                    errors.push("Priority Level must be between 1 (Low) and 3 (High)");
+                }
+            }
+            
+            if (!status) {
+                errors.push("Status is required");
+            } else {
+                const statusVal = parseInt(status);
+                if (statusVal < 1 || statusVal > 3) {
+                    errors.push("Status must be between 1 (Active) and 3 (Closed)");
+                }
+            }
+
+            // Optional field validations
+            const actionDescription = document.getElementById("TicketProcessingVietN_ActionDescription").value;
+            if (actionDescription && actionDescription.length > 500) {
+                errors.push("Action Description cannot exceed 500 characters");
+            }
+
+            const relatedTicketCode = document.getElementById("TicketProcessingVietN_RelatedTicketCode").value;
+            if (relatedTicketCode && relatedTicketCode.length > 50) {
+                errors.push("Related Ticket Code cannot exceed 50 characters");
+            }
+
+            const overdueDays = document.getElementById("TicketProcessingVietN_OverdueDays").value;
+            if (overdueDays && (parseFloat(overdueDays) < 0 || parseFloat(overdueDays) > 999)) {
+                errors.push("Overdue Days must be between 0 and 999");
+            }
+
+            const escalationLevel = document.getElementById("TicketProcessingVietN_EscalationLevel").value;
+            if (escalationLevel && (parseInt(escalationLevel) < 0 || parseInt(escalationLevel) > 5)) {
+                errors.push("Escalation Level must be between 0 and 5");
+            }
+
+            const processedBy = document.getElementById("TicketProcessingVietN_ProcessedBy").value;
+            if (processedBy && processedBy.length > 100) {
+                errors.push("Processed By cannot exceed 100 characters");
+            }
+
+            const resolvedNote = document.getElementById("TicketProcessingVietN_ResolvedNote").value;
+            if (resolvedNote && resolvedNote.length > 1000) {
+                errors.push("Resolved Note cannot exceed 1000 characters");
+            }
+
+            if (errors.length > 0) {
+                showToast(errors.join("\n"), "error");
+                return false;
+            }
+            return true;
+        }
+
         var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
 
         connection.start().then(function () {
@@ -214,6 +314,11 @@
         const btnHubUpdate = document.getElementById("btnHubUpdate");
         btnHubUpdate?.addEventListener("click", function (event) {
             event.preventDefault();
+
+            // Validate form before sending
+            if (!validateFormUpdate()) {
+                return;
+            }
 
             var dataObj = JSON.stringify({
                 TicketProcessingVietNid: document.getElementById("TicketProcessingVietN_TicketProcessingVietNid").value,

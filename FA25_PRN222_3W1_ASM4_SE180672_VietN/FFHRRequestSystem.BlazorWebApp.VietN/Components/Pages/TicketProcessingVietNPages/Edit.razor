@@ -1,5 +1,7 @@
 ﻿@page "/ticketprocessingvietns/edit"
 @rendermode InteractiveServer
+@attribute [Authorize(Roles = "1, 3")]
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using FFHRRequestSystem.Entitites.VietN.Models
 @using FFHRRequestSystem.Services.VietN
@@ -277,5 +279,14 @@ else
         var exists = ticket != null;
         Console.WriteLine($"Ticket exists: {exists}");
         return exists;
+    }
+
+    private bool ValidateTicketReference(string ticketReference)
+    {
+        if (string.IsNullOrEmpty(ticketReference)) return false;
+
+        // Regex: starts with uppercase, followed by letters, numbers, spaces (for Title Case), no special chars
+        var regex = new System.Text.RegularExpressions.Regex(@"^[A-Z][a-zA-Z0-9\s]*$");
+        return regex.IsMatch(ticketReference) && !ticketReference.Contains("@") && !ticketReference.Contains("#");
     }
 }
