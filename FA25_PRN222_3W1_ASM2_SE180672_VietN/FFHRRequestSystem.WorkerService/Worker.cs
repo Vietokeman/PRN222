@@ -4,9 +4,9 @@ using System.Text.Json.Serialization;
 namespace FFHRRequestSystem.WorkerService
 {
     /*
-     sc create "FFHRRequestSystem_WorkerService" binPath= "D:\PRN222\FA25_PRN222_3W1_ASM2_SE180672_VietN\FFHRRequestSystem.WorkerService\bin\Debug\net8.0\FFHRRequestSystem.WorkerService.exe"
+     sc create "vu627" binPath= "D:\PRN222\FA25_PRN222_3W1_ASM2_SE180672_VietN\FFHRRequestSystem.WorkerService\bin\Debug\net8.0\FFHRRequestSystem.WorkerService.exe"
 
-    sc delete "FFHRRequestSystem_WorkerService"
+    sc delete "vu627"
      */
     public class Worker : BackgroundService
     {

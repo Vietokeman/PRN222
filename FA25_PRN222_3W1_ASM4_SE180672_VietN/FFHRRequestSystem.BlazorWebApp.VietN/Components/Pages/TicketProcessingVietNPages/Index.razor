@@ -2,14 +2,22 @@
 @rendermode InteractiveServer
 @using FFHRRequestSystem.Entitites.VietN.Models
 @using FFHRRequestSystem.Services.VietN
+@using System.Security.Claims
 @inject TicketProcessingVietNService _ticketService
 @inject NavigationManager _navigationManager
+@inject EmailService _emailService
+@inject ExcelExportService _excelExportService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JS
 
 <PageTitle>Tickets Management</PageTitle>
 
 <div class="content-header">
     <h1><i class="bi bi-ticket-perforated"></i> Tickets Management</h1>
     <div class="header-actions">
+        <button @onclick="ShowExportModal" class="btn-export" style="margin-right: 10px;">
+            <i class="bi bi-file-earmark-excel"></i> EXPORT TO EXCEL
+        </button>
         <a href="/ticketprocessingvietns/create" class="btn-add-new">
             <i class="bi bi-plus-circle"></i> ADD NEW TICKET
         </a>
@@ -391,10 +399,398 @@
     }
 </div>
 
+<!-- Export Modal -->
+@if (showExportModal)
+{
+    <div class="modal-overlay" @onclick="CloseExportModal">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="bi bi-file-earmark-excel"></i>
+                </div>
+                <h2>Export to Excel</h2>
+                <button class="modal-close" @onclick="CloseExportModal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                @if (isExporting)
+                {
+                    <div class="export-progress">
+                        <div class="spinner"></div>
+                        <p>@exportMessage</p>
+                    </div>
+                }
+                else if (exportSuccess)
+                {
+                    <div class="export-success">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <h3>Export Successful!</h3>
+                        <p>@exportMessage</p>
+                    </div>
+                }
+                else if (!string.IsNullOrEmpty(exportError))
+                {
+                    <div class="export-error">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <h3>Export Failed</h3>
+                        <p>@exportError</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="export-info">
+                        <div class="info-item">
+                            <i class="bi bi-file-earmark-spreadsheet"></i>
+                            <div>
+                                <strong>Total Records</strong>
+                                <p>@AllTickets.Count tickets will be exported</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-envelope"></i>
+                            <div>
+                                <strong>Delivery Method</strong>
+                                <p>Excel file will be sent to your email</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-clock"></i>
+                            <div>
+                                <strong>Processing Time</strong>
+                                <p>Usually takes a few seconds</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="export-email-info">
+                        <i class="bi bi-info-circle"></i>
+                        <p>The Excel file will be sent to: <strong>@currentUserEmail</strong></p>
+                    </div>
+                }
+            </div>
+            
+            <div class="modal-footer">
+                @if (!isExporting && !exportSuccess)
+                {
+                    <button class="btn-cancel" @onclick="CloseExportModal">Cancel</button>
+                    <button class="btn-confirm" @onclick="HandleExport">
+                        <i class="bi bi-download"></i> Export & Send Email
+                    </button>
+                }
+                else if (exportSuccess)
+                {
+                    <button class="btn-confirm" @onclick="CloseExportModal">Close</button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .btn-export {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-export:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+    }
+
+    .btn-export i {
+        font-size: 18px;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease;
+    }
+
+    @@keyframes slideUp {
+        from {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%);
+        padding: 30px;
+        position: relative;
+        text-align: center;
+        color: white;
+    }
+
+    .modal-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        font-size: 40px;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+    }
+
+    .modal-body {
+        padding: 30px;
+    }
+
+    .export-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+        border-radius: 8px;
+        border-left: 4px solid #FFC107;
+    }
+
+    .info-item i {
+        font-size: 32px;
+        color: #FFC107;
+    }
+
+    .info-item strong {
+        display: block;
+        color: #333;
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    .info-item p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .export-email-info {
+        margin-top: 20px;
+        padding: 15px;
+        background: #e3f2fd;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-left: 4px solid #2196F3;
+    }
+
+    .export-email-info i {
+        color: #2196F3;
+        font-size: 20px;
+    }
+
+    .export-email-info p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .export-email-info strong {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .export-progress {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #FFC107;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .export-progress p {
+        color: #666;
+        font-size: 16px;
+    }
+
+    .export-success {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .export-success i {
+        font-size: 80px;
+        color: #4CAF50;
+        margin-bottom: 20px;
+    }
+
+    .export-success h3 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .export-success p {
+        color: #666;
+    }
+
+    .export-error {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .export-error i {
+        font-size: 80px;
+        color: #f44336;
+        margin-bottom: 20px;
+    }
+
+    .export-error h3 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .export-error p {
+        color: #666;
+    }
+
+    .modal-footer {
+        padding: 20px 30px;
+        background: #f8f8f8;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .btn-cancel {
+        padding: 12px 24px;
+        background: #f5f5f5;
+        color: #666;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #e0e0e0;
+    }
+
+    .btn-confirm {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+    }
+</style>
+
 @code {
     private List<TicketProcessingVietN> AllTickets { get; set; } = new();
     private List<TicketProcessingVietN> PagedTickets { get; set; } = new();
     private bool isLoading = true;
+
+    // Export modal
+    private bool showExportModal = false;
+    private bool isExporting = false;
+    private bool exportSuccess = false;
+    private string exportMessage = string.Empty;
+    private string exportError = string.Empty;
+    private string currentUserEmail = string.Empty;
+    private string currentUserName = string.Empty;
 
     // Search parameters
     private string ProcessingAction { get; set; } = string.Empty;
@@ -417,6 +813,18 @@
     protected override async Task OnInitializedAsync()
     {
         Console.WriteLine("=== Index.razor OnInitializedAsync Started ===");
+        
+        // Get current user's email
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            currentUserEmail = user.FindFirst(ClaimTypes.Email)?.Value ?? "";
+            currentUserName = user.FindFirst(ClaimTypes.Name)?.Value ?? "";
+            Console.WriteLine($"Current user: {currentUserName}, Email: {currentUserEmail}");
+        }
+        
         await LoadData();
         Console.WriteLine("=== Index.razor OnInitializedAsync Completed ===");
     }
@@ -545,16 +953,17 @@
         ApplySorting();
         ApplyPagination();
         Console.WriteLine("=== SortBy Completed ===");
+        await Task.CompletedTask;
     }
 
-    private async Task GoToPage(int page)
+    private void GoToPage(int page)
     {
         if (page < 1 || page > TotalPages) return;
         CurrentPage = page;
         ApplyPagination();
     }
 
-    private async Task ChangePageSize()
+    private void ChangePageSize()
     {
         CurrentPage = 1;
         ApplyPagination();
@@ -580,5 +989,79 @@
         }
 
         return pages;
+    }
+
+    private void ShowExportModal()
+    {
+        Console.WriteLine("=== ShowExportModal ===");
+        showExportModal = true;
+        isExporting = false;
+        exportSuccess = false;
+        exportError = string.Empty;
+        exportMessage = string.Empty;
+    }
+
+    private void CloseExportModal()
+    {
+        Console.WriteLine("=== CloseExportModal ===");
+        showExportModal = false;
+    }
+
+    private async Task HandleExport()
+    {
+        Console.WriteLine("=== HandleExport Started ===");
+        
+        if (string.IsNullOrEmpty(currentUserEmail))
+        {
+            exportError = "No email address found for current user. Please contact administrator.";
+            return;
+        }
+
+        isExporting = true;
+        exportMessage = "Generating Excel file...";
+        StateHasChanged();
+
+        try
+        {
+            // Step 1: Generate Excel file
+            Console.WriteLine($"Exporting {AllTickets.Count} tickets to Excel...");
+            var excelData = _excelExportService.ExportTicketsToExcel(AllTickets);
+            Console.WriteLine("Excel file generated successfully");
+
+            // Step 2: Send email
+            exportMessage = "Sending email...";
+            StateHasChanged();
+
+            var fileName = $"TicketProcessing_Export_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            var emailBody = _emailService.GenerateExportEmailHtml(currentUserName, AllTickets.Count);
+            
+            Console.WriteLine($"Sending email to: {currentUserEmail}");
+            await _emailService.SendEmailWithAttachmentAsync(
+                currentUserEmail,
+                "Ticket Processing Export - Excel Report",
+                emailBody,
+                excelData,
+                fileName
+            );
+
+            Console.WriteLine("Email sent successfully");
+
+            // Success
+            isExporting = false;
+            exportSuccess = true;
+            exportMessage = $"Excel file has been successfully sent to {currentUserEmail}";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR in HandleExport: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            
+            isExporting = false;
+            exportError = $"Failed to export and send email: {ex.Message}";
+            StateHasChanged();
+        }
+
+        Console.WriteLine("=== HandleExport Completed ===");
     }
 }

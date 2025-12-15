@@ -267,6 +267,7 @@
             {
                 new Claim(ClaimTypes.Name, LoginModel.UserName),
                 new Claim(ClaimTypes.Role, userAccount.RoleId.ToString()),
+                new Claim(ClaimTypes.Email, userAccount.Email ?? ""),
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

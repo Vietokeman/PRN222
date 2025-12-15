@@ -12,10 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Configure SMTP settings
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
+
 // Add services
 builder.Services.AddScoped<TicketProcessingVietNService>();
 builder.Services.AddScoped<ProcessingTypeVietNService>();
 builder.Services.AddScoped<SystemUserAccountService>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<ExcelExportService>();
 
 // Add Blazored Toast
 builder.Services.AddBlazoredToast();
