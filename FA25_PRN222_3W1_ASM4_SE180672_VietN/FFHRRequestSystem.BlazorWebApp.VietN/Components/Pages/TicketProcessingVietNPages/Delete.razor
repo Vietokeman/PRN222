@@ -80,13 +80,13 @@
             </div>
         </div>
 
-        <EditForm Model="ticketprocessingvietn" OnValidSubmit="DeleteTicketProcessingVietN" FormName="DeleteTicketForm">
+        <EditForm Model="ticketprocessingvietn" OnSubmit="DeleteTicketProcessingVietN" FormName="DeleteTicketForm">
             <AntiforgeryToken />
             <div class="d-flex justify-content-between">
                 <a href="/ticketprocessingvietns" class="btn btn-secondary">
                     <i class="bi bi-x-circle"></i> Cancel
                 </a>
-                <button type="submit" class="btn btn-danger">
+                <button type="submit" class="btn btn-danger" disabled="@(ticketprocessingvietn is null)">
                     <i class="bi bi-trash"></i> Confirm Delete
                 </button>
             </div>
@@ -97,13 +97,21 @@
 @code {
     private TicketProcessingVietN? ticketprocessingvietn;
 
-    [SupplyParameterFromQuery]
+    [SupplyParameterFromQuery(Name = "ticketprocessingvietnid")]
     private Guid TicketProcessingVietNid { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         Console.WriteLine("=== Delete.razor OnInitializedAsync Started ===");
         Console.WriteLine($"TicketProcessingVietNid: {TicketProcessingVietNid}");
+        
+        if (TicketProcessingVietNid == Guid.Empty)
+        {
+            Console.WriteLine("ERROR: Invalid ID (Guid.Empty)");
+            _toastService.ShowError("Invalid ticket ID!");
+            _navigationManager.NavigateTo("/ticketprocessingvietns");
+            return;
+        }
         
         try
         {
@@ -113,7 +121,8 @@
             if (ticketprocessingvietn is null)
             {
                 Console.WriteLine("ERROR: Ticket not found!");
-                _navigationManager.NavigateTo("notfound");
+                _toastService.ShowError("Ticket not found!");
+                _navigationManager.NavigateTo("/ticketprocessingvietns");
             }
             else
             {
@@ -124,6 +133,8 @@
         {
             Console.WriteLine($"ERROR in OnInitializedAsync: {ex.Message}");
             Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            _toastService.ShowError($"Error loading ticket: {ex.Message}");
+            _navigationManager.NavigateTo("/ticketprocessingvietns");
         }
         Console.WriteLine("=== Delete.razor OnInitializedAsync Completed ===");
     }
@@ -131,19 +142,35 @@
     private async Task DeleteTicketProcessingVietN()
     {
         Console.WriteLine("=== DeleteTicketProcessingVietN Started ===");
+        
+        if (ticketprocessingvietn is null)
+        {
+            Console.WriteLine("ERROR: ticketprocessingvietn is null!");
+            _toastService.ShowError("Cannot delete: ticket data not loaded!");
+            return;
+        }
+        
         try
         {
-            Console.WriteLine($"Deleting ticket: {ticketprocessingvietn!.ProcessingCode}");
+            Console.WriteLine($"Deleting ticket: {ticketprocessingvietn.ProcessingCode}");
             Console.WriteLine($"Ticket ID: {TicketProcessingVietNid}");
             
             Console.WriteLine("Calling service DeleteAsync...");
-            await _ticketService.DeleteAsync(TicketProcessingVietNid);
+            var result = await _ticketService.DeleteAsync(TicketProcessingVietNid);
             
-            Console.WriteLine("Ticket deleted successfully!");
-            _toastService.ShowSuccess($"Ticket {ticketprocessingvietn.ProcessingCode} deleted successfully!");
-            
-            Console.WriteLine("Navigating to index page...");
-            _navigationManager.NavigateTo("/ticketprocessingvietns");
+            if (result)
+            {
+                Console.WriteLine("Ticket deleted successfully!");
+                _toastService.ShowSuccess($"Ticket '{ticketprocessingvietn.ProcessingCode}' deleted successfully!");
+                
+                Console.WriteLine("Navigating to index page...");
+                _navigationManager.NavigateTo("/ticketprocessingvietns", forceLoad: true);
+            }
+            else
+            {
+                Console.WriteLine("ERROR: Delete operation returned false");
+                _toastService.ShowError("Failed to delete ticket!");
+            }
         }
         catch (Exception ex)
         {
