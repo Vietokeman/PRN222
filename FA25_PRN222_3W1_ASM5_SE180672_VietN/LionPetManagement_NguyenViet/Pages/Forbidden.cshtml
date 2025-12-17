@@ -1,0 +1,29 @@
+@page
+@model LionPetManagement_NguyenViet.Pages.ForbiddenModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Denied</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="alert alert-danger text-center" role="alert">
+            <h1 class="display-4">Access Denied</h1>
+            <p class="lead">You have no permission to access this function!</p>
+            <hr class="my-4">
+            <p>
+                <a asp-page="/LionProfile/Index" class="btn btn-primary">Go to Lion Profile List</a>
+                <a asp-page="/Logout" class="btn btn-secondary">Logout</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,5 +1,5 @@
 ﻿@page
-@model LionPetManagement_NguyenViet.Pages.LionProfiles.DeleteModel
+@model LionPetManagement_NguyenViet.Pages.LionProfile.DeleteModel
 
 @{
     ViewData["Title"] = "Delete";
@@ -50,7 +50,7 @@
         </dd>
     </dl>
     
-    <form method="post">
+    <form method="post" onsubmit="return confirm('Are you sure you want to delete this Lion Profile?');">
         <input type="hidden" asp-for="LionProfile.LionProfileId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-page="./Index">Back to List</a>

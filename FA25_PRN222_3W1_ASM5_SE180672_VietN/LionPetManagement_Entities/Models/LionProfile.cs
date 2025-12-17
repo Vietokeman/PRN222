@@ -14,19 +14,27 @@ public partial class LionProfile
     [Key]
     public int LionProfileId { get; set; }
 
+    [Required(ErrorMessage = "LionTypeId is required")]
+    [Display(Name = "Lion Type")]
     public int LionTypeId { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "LionName is required")]
     [StringLength(150)]
+    [MinLength(4, ErrorMessage = "LionName must be at least 4 characters")]
+    [RegularExpression(@"^(?!.*[#@&()])[A-Z][a-zA-Z]*(\s+[A-Z][a-zA-Z]*)*$", 
+        ErrorMessage = "LionName must not contain special characters (#, @, &, (, )) and each word must start with a capital letter")]
+    [Display(Name = "Lion Name")]
     public string LionName { get; set; }
 
+    [Required(ErrorMessage = "Weight is required")]
+    [Range(30.1, double.MaxValue, ErrorMessage = "Weight must be greater than 30")]
     public double Weight { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Characteristics is required")]
     [StringLength(2000)]
     public string Characteristics { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Warning is required")]
     [StringLength(1500)]
     public string Warning { get; set; }
 

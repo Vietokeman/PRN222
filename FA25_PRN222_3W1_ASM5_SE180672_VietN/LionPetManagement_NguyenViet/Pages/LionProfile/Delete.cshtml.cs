@@ -7,20 +7,26 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using LionPetManagement_Entities.Models;
 using LionPetManagement_Repositories.DBContext;
+using LionPetManagement_Services;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
 
-namespace LionPetManagement_NguyenViet.Pages.LionProfiles
+namespace LionPetManagement_NguyenViet.Pages.LionProfile
 {
+    [Authorize(Roles = "2")]
     public class DeleteModel : PageModel
     {
-        private readonly LionPetManagement_Repositories.DBContext.SU25LionDBContext _context;
+        private readonly LionProfileService _service;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public DeleteModel(LionPetManagement_Repositories.DBContext.SU25LionDBContext context)
+        public DeleteModel(LionProfileService service, IHubContext<NotificationHub> hubContext)
         {
-            _context = context;
+            _service = service;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
-        public LionProfile LionProfile { get; set; } = default!;
+        public LionPetManagement_Entities.Models.LionProfile LionProfile { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -29,7 +35,7 @@ namespace LionPetManagement_NguyenViet.Pages.LionProfiles
                 return NotFound();
             }
 
-            var lionprofile = await _context.LionProfiles.FirstOrDefaultAsync(m => m.LionProfileId == id);
+            var lionprofile = await _service.GetByIdAsync(id.Value);
 
             if (lionprofile == null)
             {
@@ -49,12 +55,13 @@ namespace LionPetManagement_NguyenViet.Pages.LionProfiles
                 return NotFound();
             }
 
-            var lionprofile = await _context.LionProfiles.FindAsync(id);
+            var lionprofile = await _service.GetByIdAsync(id.Value);
             if (lionprofile != null)
             {
-                LionProfile = lionprofile;
-                _context.LionProfiles.Remove(LionProfile);
-                await _context.SaveChangesAsync();
+                await _service.DeleteAsync(lionprofile.LionProfileId);
+                
+                // Notify all clients via SignalR
+                await _hubContext.Clients.All.SendAsync("ReceiveDelete", id.ToString());
             }
 
             return RedirectToPage("./Index");

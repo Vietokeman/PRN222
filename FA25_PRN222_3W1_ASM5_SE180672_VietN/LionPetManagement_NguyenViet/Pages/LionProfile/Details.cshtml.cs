@@ -7,19 +7,22 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using LionPetManagement_Entities.Models;
 using LionPetManagement_Repositories.DBContext;
+using LionPetManagement_Services;
+using Microsoft.AspNetCore.Authorization;
 
-namespace LionPetManagement_NguyenViet.Pages.LionProfiles
+namespace LionPetManagement_NguyenViet.Pages.LionProfile
 {
+    [Authorize(Roles = "2, 3")]
     public class DetailsModel : PageModel
     {
-        private readonly LionPetManagement_Repositories.DBContext.SU25LionDBContext _context;
+        private readonly LionProfileService _service;
 
-        public DetailsModel(LionPetManagement_Repositories.DBContext.SU25LionDBContext context)
+        public DetailsModel(LionProfileService service)
         {
-            _context = context;
+            _service = service;
         }
 
-        public LionProfile LionProfile { get; set; } = default!;
+        public LionPetManagement_Entities.Models.LionProfile LionProfile { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,7 +31,7 @@ namespace LionPetManagement_NguyenViet.Pages.LionProfiles
                 return NotFound();
             }
 
-            var lionprofile = await _context.LionProfiles.FirstOrDefaultAsync(m => m.LionProfileId == id);
+            var lionprofile = await _service.GetByIdAsync(id.Value);
             if (lionprofile == null)
             {
                 return NotFound();
