@@ -5,6 +5,12 @@ VisualStudioVersion = 17.14.36511.14 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionPetManagement_NguyenViet", "LionPetManagement_NguyenViet\LionPetManagement_NguyenViet.csproj", "{820AD0C4-2D5C-4B0C-B77D-5C7EB7EF5102}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionPetManagement.Repositories", "LionPetManagement.Repositories\LionPetManagement.Repositories.csproj", "{73E6DFCF-B946-4EB9-8D98-E02FA0DA28D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionPetManagement.Services", "LionPetManagement.Services\LionPetManagement.Services.csproj", "{D0AF1D17-A48B-46F1-A603-3B78B92E3CFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionPetManagement.Entities", "LionPetManagement.Entities\LionPetManagement.Entities.csproj", "{5D34C917-9D63-4626-BE49-63A88695D04F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{820AD0C4-2D5C-4B0C-B77D-5C7EB7EF5102}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{820AD0C4-2D5C-4B0C-B77D-5C7EB7EF5102}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{820AD0C4-2D5C-4B0C-B77D-5C7EB7EF5102}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73E6DFCF-B946-4EB9-8D98-E02FA0DA28D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73E6DFCF-B946-4EB9-8D98-E02FA0DA28D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73E6DFCF-B946-4EB9-8D98-E02FA0DA28D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73E6DFCF-B946-4EB9-8D98-E02FA0DA28D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0AF1D17-A48B-46F1-A603-3B78B92E3CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0AF1D17-A48B-46F1-A603-3B78B92E3CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0AF1D17-A48B-46F1-A603-3B78B92E3CFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0AF1D17-A48B-46F1-A603-3B78B92E3CFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D34C917-9D63-4626-BE49-63A88695D04F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D34C917-9D63-4626-BE49-63A88695D04F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D34C917-9D63-4626-BE49-63A88695D04F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D34C917-9D63-4626-BE49-63A88695D04F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

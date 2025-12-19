@@ -1,7 +1,26 @@
+using LionPetManagement.Services;
+using LionPetManagement_NguyenViet;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
+
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.AccessDeniedPath = "/Forbidden";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+        options.LoginPath = "/Login";
+    });
+
+builder.Services.AddScoped<LionAccountService>();
+builder.Services.AddScoped<LionProfileService>();
+builder.Services.AddScoped<LionTypeService>();
+
 
 var app = builder.Build();
 
@@ -18,8 +37,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorPages();
+app.MapHub<NotificationHub>("/notificationHub");
+
+app.MapRazorPages().RequireAuthorization();
 
 app.Run();
