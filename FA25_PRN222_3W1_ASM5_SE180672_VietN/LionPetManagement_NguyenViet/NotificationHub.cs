@@ -6,7 +6,7 @@ namespace LionPetManagement_NguyenViet
     {
         public async Task HubDelete(string id)
         {
-            await Clients.All.SendAsync("ReceiveDelete", id);
+            await Clients.All.SendAsync("ReceiverDelete", id);
         }
     }
 
